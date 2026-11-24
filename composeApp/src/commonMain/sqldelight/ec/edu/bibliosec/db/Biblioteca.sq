@@ -101,3 +101,22 @@ SELECT COUNT(*) AS total FROM Prestamo;
 
 contarResenas:
 SELECT COUNT(*) AS total FROM Resena;
+
+-- Consultas de apoyo para la UI (F2); en F5 se sustituyen por repositorios seguros
+librosPorId:
+SELECT * FROM Libro WHERE id = ?;
+
+todosLosLibros:
+SELECT * FROM Libro ORDER BY id;
+
+prestamosDelUsuario:
+SELECT * FROM Prestamo WHERE usuarioId = ? ORDER BY id DESC;
+
+resenasDelLibro:
+SELECT * FROM Resena WHERE libroId = ? ORDER BY id DESC;
+
+prestamoPorId:
+SELECT * FROM Prestamo WHERE id = ?;
+
+prestamosAprobados:
+SELECT * FROM Prestamo WHERE estado = 'APROBADO' ORDER BY id DESC;

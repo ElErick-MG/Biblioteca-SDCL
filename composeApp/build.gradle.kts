@@ -21,6 +21,7 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
+            implementation(compose.preview)
             implementation(libs.sqldelight.runtime)
         }
 

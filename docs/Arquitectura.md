@@ -393,6 +393,7 @@ flowchart TD
 | ADR-09 | R8/ProGuard solo en release | Ofuscación como mitigación VULN-08 sin estorbar el debug de la demo |
 | ADR-10 | AGP 9 con banderas de compatibilidad temporal | `com.android.application` + KMP en el mismo módulo requiere `android.builtInKotlin=false` y `android.newDsl=false`; `resValues=true` para `app_name` por flavor; `compileSdk=36` porque Compose 1.11 / activity 1.13 lo exigen (`targetSdk` sigue en 35). Migrar a la estructura de dos módulos antes de AGP 10 |
 | ADR-11 | Target `jvm()` sin UI solo para pruebas | Permite verificar el seed y el hashing con `JdbcSqliteDriver` en memoria sin dispositivo; los `actual` de JVM son independientes de los de Android. En SQLDelight 2.4 los drivers están en `app.cash.sqldelight.driver.*` y la propiedad generada es `database.bibliotecaQueries` |
+| ADR-12 | Navegación por estado propio + WebView `expect @Composable` | Se evita añadir una librería de navegación: `Ruta` + `AppState` (Compose state) cubren F2. El comprobante usa `expect @Composable` con actual Android (`WebView`, JS off) y actual JVM (texto), de modo que la UI permanece en `commonMain`. `@Preview` se importa desde `androidx.compose.ui.tooling.preview` con `compose.preview` |
 
 ---
 
@@ -405,8 +406,9 @@ flowchart TD
 | Dominio y `Biblioteca.sq` + seed | ✅ Implementados y verificados (F1) |
 | `DriverFactory`, `PasswordHasher`, `BuildConfigProvider` (expect/actual) | ✅ Implementados para Android y JVM (F1) |
 | Interfaces de repositorio + `ServiceLocator` | ✅ Creadas; implementaciones en F3/F5 (F1) |
-| Pantallas funcionales y navegación | ❌ Solo `App.kt` de verificación (F2) |
-| Tests automatizados | 🟨 4 tests en `jvmTest` (seed, filtro, hashing); suites completas en F6 |
+| Pantallas funcionales y navegación | ✅ 7 pantallas con `@Preview` + `Ruta`/`AppState` (F2) |
+| WebView multiplataforma + `HtmlSanitizer` | ✅ Implementados (F2); F3/F5 alternarán la variante vulnerable |
+| Tests automatizados | 🟨 8 tests en `jvmTest` (seed, hashing, navegación); suites completas en F6 |
 | `.github/workflows/devsecops.yml`, `.semgrep/`, `config/detekt/` | ❌ No existe (F7) |
 | Documentación de onboarding y seguimiento | ✅ Creada (`AGENTS.md`, `docs/*.md`) |
 
@@ -414,4 +416,6 @@ flowchart TD
 
 **Verificación F1:** `./gradlew allTests` → `BUILD SUCCESSFUL` (4 tests). Seed: 3 usuarios, 13 libros (3 restringidos), 2 préstamos, 2 reseñas. `PasswordHasher` verificado con salt distinto y `verify` OK/KO.
 
-**Siguiente paso:** F2. UI base — pantallas, `@Preview` y navegación por rol.
+**Verificación F2:** `./gradlew assembleVulnerableDebug assembleSeguraDebug allTests` → `BUILD SUCCESSFUL` (8 tests). Lector → Catálogo, bibliotecario → Admin, credenciales inválidas → Login, catálogo del lector sin restringidos.
+
+**Siguiente paso:** F3. Implementación vulnerable — repositorios, sesión, logs, manifiesto y WebView inseguros con `// VULN-n`.

@@ -17,7 +17,11 @@ class MainActivity : ComponentActivity() {
         val resumen = DatabaseModule.resumen(database)
 
         setContent {
-            App(resumen = resumen, esSeguro = ServiceLocator.esSeguro)
+            App(
+                database = database,
+                resumen = resumen,
+                esSeguro = ServiceLocator.esSeguro,
+            )
         }
     }
 }

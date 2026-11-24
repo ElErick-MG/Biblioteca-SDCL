@@ -14,7 +14,7 @@ Sistema de biblioteca móvil con laboratorio de vulnerabilidades (versión **vul
 | :--- | :--- |
 | F0. Setup | ✅ Completada y verificada (dos APK con `applicationId` distinto) |
 | F1. Dominio y BD | ✅ Completada y verificada (seed + tests `allTests` en verde) |
-| F2. UI base | ⬜ Pendiente |
+| F2. UI base | ✅ Completada (7 pantallas, `@Preview` y navegación por rol) |
 | F3. Implementación vulnerable | ⬜ Pendiente |
 | F4. Matriz y pentesting | ⬜ Pendiente |
 | F5. Implementación segura | ⬜ Pendiente |
