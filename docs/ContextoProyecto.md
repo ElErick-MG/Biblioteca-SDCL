@@ -52,9 +52,11 @@ Biblioteca-SDCL/
 - `composeApp/build/outputs/apk/vulnerable/debug/composeApp-vulnerable-debug.apk` → `ec.edu.bibliosec.vulnerable`, label `BiblioSec (VULN)`, `SECURE_MODE=false`.
 - `composeApp/build/outputs/apk/segura/debug/composeApp-segura-debug.apk` → `ec.edu.bibliosec.segura`, label `BiblioSec (SEGURA)`, `SECURE_MODE=true`.
 
-**No existe todavía:** esquema `Biblioteca.sq`, seed, repositorios, pantallas funcionales, tests `commonTest`, workflow de GitHub Actions, reportes ni evidencias.
+**F1 verificada:** `./gradlew allTests` termina en `BUILD SUCCESSFUL` (4 tests). El seed crea 3 usuarios, 13 libros (3 restringidos), 2 préstamos y 2 reseñas; `PasswordHasher` produce hashes PBKDF2 con salt distinto y `verify` funciona. La app muestra el resumen del seed al arrancar.
 
-**Conclusión:** el proyecto está en **F0 completada**; el siguiente paso de implementación es **F1 (Dominio y BD)**.
+**No existe todavía:** repositorios concretos (`data.vulnerable` / `data.segura`), pantallas funcionales, sesión, validadores, sanitizador, workflow de GitHub Actions, reportes ni evidencias.
+
+**Conclusión:** el proyecto está en **F1 completada**; el siguiente paso de implementación es **F2 (UI base y navegación por rol)**.
 
 > Distinción importante: `.docs/` (ignorado, especificación de entrada) ≠ `docs/` (versionado, entregables del proyecto).
 
@@ -82,8 +84,8 @@ Biblioteca-SDCL/
 | Fase | Nombre | Estado |
 | :--- | :--- | :--- |
 | F0 | Setup (KMP, SQLDelight, Compose, flavors) | ✅ COMPLETADA y verificada (24/11/2026) |
-| F1 | Dominio y base de datos + seed | ⬜ PENDIENTE — **siguiente paso de implementación** |
-| F2 | UI base y navegación por rol | ⬜ PENDIENTE |
+| F1 | Dominio y base de datos + seed | ✅ COMPLETADA y verificada (24/11/2026) |
+| F2 | UI base y navegación por rol | ⬜ PENDIENTE — **siguiente paso de implementación** |
 | F3 | Implementación vulnerable (`// VULN-n`) | ⬜ PENDIENTE |
 | F4 | Matriz de seguridad y pentesting inicial | ⬜ PENDIENTE |
 | F5 | Implementación segura y controles | ⬜ PENDIENTE |
@@ -174,11 +176,10 @@ Las 7 vulnerabilidades exigidas por la guía se cubren con VULN-01 a VULN-08 (SQ
 
 ## 9. Próximo paso concreto para un agente
 
-F0 está cerrada. Si el usuario pide avanzar, empezar por **F1. Dominio y BD**:
+F1 está cerrada. Si el usuario pide avanzar, empezar por **F2. UI base**:
 
-1. Crear los modelos en `commonMain/kotlin/ec/edu/bibliosec/domain/`: `Usuario`, `Libro`, `Prestamo`, `Resena`, `Rol`, `EstadoPrestamo`.
-2. Crear `commonMain/sqldelight/ec/edu/bibliosec/db/Biblioteca.sq` con las 4 tablas, `CHECK`, FK y las consultas parametrizadas de la sección 4 de la especificación.
-3. Implementar `DriverFactory` (`expect/actual`) y el `ServiceLocator` en `di/`.
-4. Cargar el seed automático: 3 usuarios, ≥12 libros (≥3 restringidos), ≥2 préstamos y ≥2 reseñas; contraseñas en texto plano en vulnerable y hasheadas en segura.
-5. Declarar interfaces en `data/repo/` (`AuthRepository`, `LibroRepository`, `PrestamoRepository`, `ResenaRepository`) sin implementaciones aún (llegan en F3/F5).
-6. Verificar que la app abre y la BD se crea con el seed, y actualizar el estado de F1 aquí y en `docs/SeguimientoEntregables.md`.
+1. Crear las pantallas en `commonMain/ui/`: Login, Catálogo, Solicitud de préstamo, Comprobante (`WebView`), Reseñas, Mis préstamos y Panel del bibliotecario, cada una con `@Preview`.
+2. Definir el modelo de navegación por rol (`LECTOR` / `BIBLIOTECARIO`) sin implementar aún los controles de seguridad definitivos (llegan en F5 con `AccessPolicy`).
+3. Conectar la UI a los ViewModels/estado (`StateFlow`) y a las interfaces de repositorio de `data/repo/`; las implementaciones concretas llegan en F3/F5.
+4. Mantener el indicador visible de variante (`VULNERABLE` / `SEGURA`) en la barra superior y el resumen de BD de F1.
+5. Verificar navegación completa por rol y actualizar el estado de F2 aquí y en `docs/SeguimientoEntregables.md`.

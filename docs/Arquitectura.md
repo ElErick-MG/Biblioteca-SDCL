@@ -392,6 +392,7 @@ flowchart TD
 | ADR-08 | `.docs/` (ignorado) vs. `docs/` (versionado) | Separar la especificación de entrada de los entregables evaluables |
 | ADR-09 | R8/ProGuard solo en release | Ofuscación como mitigación VULN-08 sin estorbar el debug de la demo |
 | ADR-10 | AGP 9 con banderas de compatibilidad temporal | `com.android.application` + KMP en el mismo módulo requiere `android.builtInKotlin=false` y `android.newDsl=false`; `resValues=true` para `app_name` por flavor; `compileSdk=36` porque Compose 1.11 / activity 1.13 lo exigen (`targetSdk` sigue en 35). Migrar a la estructura de dos módulos antes de AGP 10 |
+| ADR-11 | Target `jvm()` sin UI solo para pruebas | Permite verificar el seed y el hashing con `JdbcSqliteDriver` en memoria sin dispositivo; los `actual` de JVM son independientes de los de Android. En SQLDelight 2.4 los drivers están en `app.cash.sqldelight.driver.*` y la propiedad generada es `database.bibliotecaQueries` |
 
 ---
 
@@ -401,12 +402,16 @@ flowchart TD
 | :--- | :--- |
 | `settings.gradle.kts`, `gradle/libs.versions.toml`, `composeApp/`, wrapper | ✅ Creados y compilando (F0, 24/11/2026) |
 | Flavors `vulnerable`/`segura` + `BuildConfig.SECURE_MODE` | ✅ Verificados en los dos APK (F0) |
-| Código Kotlin funcional (dominio, repositorios, pantallas) | ❌ Solo existe `App.kt` mínima y `MainActivity.kt` (F1/F2/F3/F5) |
-| `Biblioteca.sq` y seed | ❌ No existe (F1) |
-| Tests `commonTest` | ❌ No existe (F6) |
+| Dominio y `Biblioteca.sq` + seed | ✅ Implementados y verificados (F1) |
+| `DriverFactory`, `PasswordHasher`, `BuildConfigProvider` (expect/actual) | ✅ Implementados para Android y JVM (F1) |
+| Interfaces de repositorio + `ServiceLocator` | ✅ Creadas; implementaciones en F3/F5 (F1) |
+| Pantallas funcionales y navegación | ❌ Solo `App.kt` de verificación (F2) |
+| Tests automatizados | 🟨 4 tests en `jvmTest` (seed, filtro, hashing); suites completas en F6 |
 | `.github/workflows/devsecops.yml`, `.semgrep/`, `config/detekt/` | ❌ No existe (F7) |
 | Documentación de onboarding y seguimiento | ✅ Creada (`AGENTS.md`, `docs/*.md`) |
 
 **Verificación F0:** `./gradlew assembleVulnerableDebug assembleSeguraDebug` → `BUILD SUCCESSFUL`; APKs `ec.edu.bibliosec.vulnerable` (`SECURE_MODE=false`) y `ec.edu.bibliosec.segura` (`SECURE_MODE=true`).
 
-**Siguiente paso:** F1. Dominio y BD — modelos, `Biblioteca.sq`, `DriverFactory`, seed y repositorios.
+**Verificación F1:** `./gradlew allTests` → `BUILD SUCCESSFUL` (4 tests). Seed: 3 usuarios, 13 libros (3 restringidos), 2 préstamos, 2 reseñas. `PasswordHasher` verificado con salt distinto y `verify` OK/KO.
+
+**Siguiente paso:** F2. UI base — pantallas, `@Preview` y navegación por rol.

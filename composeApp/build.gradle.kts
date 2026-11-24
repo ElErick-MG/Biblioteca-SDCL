@@ -13,6 +13,9 @@ kotlin {
         }
     }
 
+    // Target JVM sin UI: permite probar la BD con JdbcSqliteDriver en memoria (F1/F6).
+    jvm()
+
     sourceSets {
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -24,6 +27,14 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.sqldelight.android.driver)
+        }
+
+        jvmMain.dependencies {
+            implementation(libs.sqldelight.sqlite.driver)
+        }
+
+        jvmTest.dependencies {
+            implementation(libs.junit)
         }
     }
 }

@@ -1,0 +1,103 @@
+CREATE TABLE Usuario (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,          -- VULN: texto plano | SEGURA: hash "iter:saltB64:hashB64"
+    rol TEXT NOT NULL CHECK (rol IN ('LECTOR','BIBLIOTECARIO')),
+    codigoEstudiante TEXT,
+    nombreCompleto TEXT NOT NULL
+);
+
+CREATE TABLE Libro (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    isbn TEXT NOT NULL UNIQUE,
+    titulo TEXT NOT NULL,
+    autor TEXT NOT NULL,
+    categoria TEXT NOT NULL,
+    copiasDisponibles INTEGER NOT NULL DEFAULT 1,
+    restringido INTEGER NOT NULL DEFAULT 0   -- 1 = "Uso interno / Restringido"
+);
+
+CREATE TABLE Prestamo (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    libroId INTEGER NOT NULL REFERENCES Libro(id),
+    usuarioId INTEGER NOT NULL REFERENCES Usuario(id),
+    codigoEstudiante TEXT NOT NULL,
+    dias INTEGER NOT NULL,
+    observacion TEXT,
+    estado TEXT NOT NULL DEFAULT 'PENDIENTE'
+        CHECK (estado IN ('PENDIENTE','APROBADO','RECHAZADO','DEVUELTO')),
+    fechaSolicitud TEXT NOT NULL,
+    fechaDevolucion TEXT
+);
+
+CREATE TABLE Resena (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    libroId INTEGER NOT NULL REFERENCES Libro(id),
+    usuarioId INTEGER NOT NULL REFERENCES Usuario(id),
+    comentario TEXT NOT NULL,
+    fecha TEXT NOT NULL
+);
+
+-- =====================================================================
+-- Consultas SEGURAS (parametrizadas; usadas por data.segura en F5)
+-- =====================================================================
+
+loginSeguro:
+SELECT * FROM Usuario WHERE username = ?;
+
+buscarLibrosSeguro:
+SELECT * FROM Libro
+WHERE restringido = 0
+  AND (titulo LIKE '%' || :q || '%' OR autor LIKE '%' || :q || '%' OR isbn LIKE '%' || :q || '%');
+
+insertarPrestamo:
+INSERT INTO Prestamo(libroId, usuarioId, codigoEstudiante, dias, observacion, estado, fechaSolicitud)
+VALUES (?, ?, ?, ?, ?, 'PENDIENTE', ?);
+
+prestamosPendientes:
+SELECT * FROM Prestamo WHERE estado = 'PENDIENTE';
+
+actualizarEstadoPrestamo:
+UPDATE Prestamo SET estado = ?, fechaDevolucion = ? WHERE id = ?;
+
+-- =====================================================================
+-- Consultas de apoyo para el seed (F1) y verificacion (F6)
+-- =====================================================================
+
+insertarUsuario:
+INSERT INTO Usuario(username, password, rol, codigoEstudiante, nombreCompleto)
+VALUES (?, ?, ?, ?, ?);
+
+insertarLibro:
+INSERT INTO Libro(isbn, titulo, autor, categoria, copiasDisponibles, restringido)
+VALUES (?, ?, ?, ?, ?, ?);
+
+insertarResena:
+INSERT INTO Resena(libroId, usuarioId, comentario, fecha) VALUES (?, ?, ?, ?);
+
+limpiarResenas:
+DELETE FROM Resena;
+
+limpiarPrestamos:
+DELETE FROM Prestamo;
+
+limpiarLibros:
+DELETE FROM Libro;
+
+limpiarUsuarios:
+DELETE FROM Usuario;
+
+contarUsuarios:
+SELECT COUNT(*) AS total FROM Usuario;
+
+contarLibros:
+SELECT COUNT(*) AS total FROM Libro;
+
+contarLibrosRestringidos:
+SELECT COUNT(*) AS total FROM Libro WHERE restringido = 1;
+
+contarPrestamos:
+SELECT COUNT(*) AS total FROM Prestamo;
+
+contarResenas:
+SELECT COUNT(*) AS total FROM Resena;
