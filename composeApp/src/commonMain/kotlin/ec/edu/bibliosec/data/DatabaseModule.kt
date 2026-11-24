@@ -1,5 +1,6 @@
 package ec.edu.bibliosec.data
 
+import app.cash.sqldelight.db.SqlDriver
 import ec.edu.bibliosec.db.BibliotecaDatabase
 import ec.edu.bibliosec.di.secureMode
 import ec.edu.bibliosec.security.PasswordHasher
@@ -12,10 +13,26 @@ import ec.edu.bibliosec.security.PasswordHasher
  */
 object DatabaseModule {
 
+    /**
+     * Driver compartido. Los repositorios vulnerables (F3) lo necesitan para
+     * construir SQL por concatenación y demostrar SQLi (VULN-01/02).
+     */
+    private var driverCompartido: SqlDriver? = null
+
     fun crear(driverFactory: DriverFactory): BibliotecaDatabase {
-        val database = BibliotecaDatabase(driverFactory.createDriver())
+        val driver = driverFactory.createDriver()
+        driverCompartido = driver
+        val database = BibliotecaDatabase(driver)
         sembrar(database)
         return database
+    }
+
+    fun driver(): SqlDriver =
+        driverCompartido ?: error("La base de datos aún no fue creada (DatabaseModule.crear)")
+
+    /** Permite usar un driver en memoria en las pruebas de explotación controlada. */
+    fun usarDriver(driver: SqlDriver) {
+        driverCompartido = driver
     }
 
     fun sembrar(database: BibliotecaDatabase) {

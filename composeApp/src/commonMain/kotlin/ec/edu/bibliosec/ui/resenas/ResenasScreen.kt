@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ec.edu.bibliosec.domain.Libro
 import ec.edu.bibliosec.domain.Resena
+import ec.edu.bibliosec.ui.comprobante.ComprobanteWebView
 
 @Composable
 fun ResenasScreen(
@@ -28,16 +29,22 @@ fun ResenasScreen(
     onComentario: (String) -> Unit,
     onAgregar: () -> Unit,
     onVolver: () -> Unit,
+    htmlVulnerable: String? = null,
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text("Reseñas de ${libro?.titulo ?: "—"}", style = MaterialTheme.typography.headlineSmall)
         TextButton(onClick = onVolver) { Text("Volver al catálogo") }
-        LazyColumn {
-            items(resenas, key = { it.id }) { resena ->
-                Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Text(resena.comentario)
-                        Text(resena.fecha, style = MaterialTheme.typography.bodySmall)
+        if (htmlVulnerable != null) {
+            // VULN-03: reseñas inyectadas como HTML crudo en WebView con JS activo.
+            ComprobanteWebView(htmlVulnerable, Modifier.fillMaxWidth().height(240.dp))
+        } else {
+            LazyColumn {
+                items(resenas, key = { it.id }) { resena ->
+                    Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(resena.comentario)
+                            Text(resena.fecha, style = MaterialTheme.typography.bodySmall)
+                        }
                     }
                 }
             }

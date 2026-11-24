@@ -56,9 +56,11 @@ Biblioteca-SDCL/
 
 **F2 verificada:** 7 pantallas funcionales con `@Preview` (Login, Catálogo, Solicitud, Comprobante con WebView, Reseñas, Mis préstamos y Panel admin), navegación por rol y 4 tests de navegación. `./gradlew allTests` pasa con **8 tests** en total.
 
-**No existe todavía:** repositorios concretos (`data.vulnerable` / `data.segura`), sesión persistente, validadores, `AccessPolicy`, logs inseguros, manifiestos por flavor, workflow de GitHub Actions, reportes ni evidencias.
+**F3 verificada:** repositorios y componentes vulnerables aislados en `...data.vulnerable` / `...ui.vulnerable` y marcados con `// VULN-n`. `./gradlew allTests` pasa con **14 tests**: los payloads de SQLi en login y buscador, XSS en comprobante, datos inválidos, sesión en texto plano y RBAC roto funcionan; el manifiesto vulnerable empaquetado tiene `allowBackup=true`, `usesCleartextTraffic=true`, permiso INTERNET y `network_security_config` con cleartext (el de segura permanece con `allowBackup=false`).
 
-**Conclusión:** el proyecto está en **F2 completada**; el siguiente paso de implementación es **F3 (implementación vulnerable)**.
+**No existe todavía:** repositorios seguros (`data.segura`), `Validators`, `AccessPolicy`, `EncryptedSharedPreferences`, `AppLogger`, manifiesto seguro con overlay, workflow de GitHub Actions, reportes ni evidencias gráficas.
+
+**Conclusión:** el proyecto está en **F3 completada**; el siguiente paso es **F4 (matriz y pentesting: evidencias, Semgrep/Detekt/MobSF)**.
 
 > Distinción importante: `.docs/` (ignorado, especificación de entrada) ≠ `docs/` (versionado, entregables del proyecto).
 
@@ -88,8 +90,8 @@ Biblioteca-SDCL/
 | F0 | Setup (KMP, SQLDelight, Compose, flavors) | ✅ COMPLETADA y verificada (24/11/2026) |
 | F1 | Dominio y base de datos + seed | ✅ COMPLETADA y verificada (24/11/2026) |
 | F2 | UI base y navegación por rol | ✅ COMPLETADA y verificada (24/11/2026) |
-| F3 | Implementación vulnerable (`// VULN-n`) | ⬜ PENDIENTE — **siguiente paso de implementación** |
-| F4 | Matriz de seguridad y pentesting inicial | ⬜ PENDIENTE |
+| F3 | Implementación vulnerable (`// VULN-n`) | ✅ COMPLETADA y verificada (24/11/2026) |
+| F4 | Matriz de seguridad y pentesting inicial | ⬜ PENDIENTE — **siguiente paso** |
 | F5 | Implementación segura y controles | ⬜ PENDIENTE |
 | F6 | Pruebas automatizadas | ⬜ PENDIENTE |
 | F7 | CI/CD (GitHub Actions) | ⬜ PENDIENTE |
@@ -178,11 +180,10 @@ Las 7 vulnerabilidades exigidas por la guía se cubren con VULN-01 a VULN-08 (SQ
 
 ## 9. Próximo paso concreto para un agente
 
-F2 está cerrada. Si el usuario pide avanzar, empezar por **F3. Implementación vulnerable**:
+F3 está cerrada. Si el usuario pide avanzar, empezar por **F4. Matriz y pentesting inicial**:
 
-1. Crear `data/vulnerable/` con repositorios que usen **concatenación SQL** en login y búsqueda; marcar cada punto con `// VULN-01` y `// VULN-02`.
-2. Añadir el buscador vulnerable (`%' OR restringido=1 --`) y el formulario sin validación (`// VULN-04`).
-3. Renderizar comprobante y reseñas sin sanitizar, con `javaScriptEnabled = true` en la variante vulnerable (`// VULN-03`) mediante un actual específico del flavor.
-4. Guardar sesión en `SharedPreferences` estándar y credenciales en texto plano (`// VULN-05`), logs con `Log.d`/`println` sensibles (`// VULN-07`).
-5. Manifiesto overlay vulnerable: `allowBackup="true"` y `usesCleartextTraffic="true"` (`// VULN-06`), y ruta `admin` sin verificación de rol (`// VULN-09`).
-6. Verificar que los payloads de la sección 6 funcionan en la app vulnerable y actualizar F3 aquí y en `docs/SeguimientoEntregables.md`.
+1. Capturar evidencias de explotación en `docs/evidencias/VULN-01 … VULN-09/` (capturas, logs, comandos y salidas) usando solo el emulador/dispositivo propio.
+2. Completar `docs/matriz-seguridad.md` exportando la sección §3 de `docs/SeguimientoEntregables.md`, con riesgo inicial y residual.
+3. Ejecutar Semgrep (`p/kotlin`, `p/android` y `.semgrep/biblio-rules.yml`) y Detekt sobre `lab-vulnerable`, guardando los reportes en `docs/reportes/`.
+4. Ejecutar MobSF sobre el APK vulnerable (Docker, puerto 8000) y exportar el informe PDF/JSON.
+5. Marcar las filas de la matriz como ✅ solo cuando exista evidencia real y actualizar F4 aquí y en `docs/SeguimientoEntregables.md`.

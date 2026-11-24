@@ -9,9 +9,13 @@ import ec.edu.bibliosec.domain.Prestamo
 import ec.edu.bibliosec.domain.Resena
 import ec.edu.bibliosec.domain.Rol
 import ec.edu.bibliosec.domain.Usuario
+import ec.edu.bibliosec.ui.vulnerable.ValidacionVulnerable
 
-/** Estado de la navegación y de los formularios (F2, sin coroutines añadidas). */
-class AppState(private val source: UiDataSource) {
+/** Estado de la navegación y de los formularios (F2/F3, sin coroutines añadidas). */
+class AppState(
+    private val source: UiDataSource,
+    private val esSeguro: Boolean = false,
+) {
 
     var ruta by mutableStateOf<Ruta>(Ruta.Login)
         private set
@@ -103,7 +107,9 @@ class AppState(private val source: UiDataSource) {
 
     fun enviarPrestamo(libroId: Long) {
         val id = usuario?.id ?: return
-        val diasNum = dias.toLongOrNull() ?: return
+        // VULN-04: en el flavor vulnerable se acepta cualquier valor (incluso "abc" → 0).
+        if (!esSeguro && !ValidacionVulnerable.aceptar(dias, codigo, observacion)) return
+        val diasNum = if (esSeguro) (dias.toLongOrNull() ?: return) else (dias.toLongOrNull() ?: 0L)
         comprobanteId = source.solicitar(libroId, id, codigo, diasNum, observacion)
         recargar()
         ruta = Ruta.Comprobante(comprobanteId)

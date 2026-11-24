@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import ec.edu.bibliosec.db.BibliotecaDatabase
+import ec.edu.bibliosec.di.ServiceLocator
 import ec.edu.bibliosec.domain.Rol
 import ec.edu.bibliosec.ui.AccesoDenegadoScreen
 import ec.edu.bibliosec.ui.AppState
@@ -19,6 +20,8 @@ import ec.edu.bibliosec.ui.login.LoginScreen
 import ec.edu.bibliosec.ui.prestamo.PrestamoScreen
 import ec.edu.bibliosec.ui.prestamos.MisPrestamosScreen
 import ec.edu.bibliosec.ui.resenas.ResenasScreen
+import ec.edu.bibliosec.ui.vulnerable.AccesoVulnerable
+import ec.edu.bibliosec.ui.vulnerable.ComprobanteHtmlVulnerable
 
 /**
  * Punto de entrada compartido de la UI (F2).
@@ -29,8 +32,10 @@ import ec.edu.bibliosec.ui.resenas.ResenasScreen
  */
 @Composable
 fun App(database: BibliotecaDatabase, resumen: String, esSeguro: Boolean) {
-    val source = remember(database) { UiDataSource(database) }
-    val state = remember(source) { AppState(source).also { it.iniciar() } }
+    val source = remember(database) {
+        UiDataSource(database, ServiceLocator.repositoriosActuales())
+    }
+    val state = remember(source) { AppState(source, esSeguro).also { it.iniciar() } }
 
     Surface {
         Column {
@@ -68,6 +73,7 @@ fun App(database: BibliotecaDatabase, resumen: String, esSeguro: Boolean) {
                     onObservacion = { state.cambiarObservacion(it) },
                     onEnviar = { state.enviarPrestamo(ruta.libroId) },
                     onVolver = { state.abrirCatalogo() },
+                    permitirObservacionLarga = !esSeguro,
                 )
 
                 is Ruta.Comprobante -> {
@@ -79,6 +85,15 @@ fun App(database: BibliotecaDatabase, resumen: String, esSeguro: Boolean) {
                         observacion = prestamo?.observacion.orEmpty(),
                         estado = prestamo?.estado?.name ?: "—",
                         onVolver = { state.abrirCatalogo() },
+                        htmlVulnerable = if (!esSeguro) {
+                            ComprobanteHtmlVulnerable.construir(
+                                libro = prestamo?.let { source.libro(it.libroId)?.titulo } ?: "—",
+                                usuario = state.usuario?.nombreCompleto ?: "—",
+                                dias = prestamo?.dias ?: 0,
+                                observacion = prestamo?.observacion.orEmpty(),
+                                estado = prestamo?.estado?.name ?: "—",
+                            )
+                        } else null,
                     )
                 }
 
@@ -89,6 +104,9 @@ fun App(database: BibliotecaDatabase, resumen: String, esSeguro: Boolean) {
                     onComentario = { state.cambiarComentario(it) },
                     onAgregar = { state.agregarResena(ruta.libroId) },
                     onVolver = { state.abrirCatalogo() },
+                    htmlVulnerable = if (!esSeguro) {
+                        ComprobanteHtmlVulnerable.reseñas(state.resenas.map { it.comentario })
+                    } else null,
                 )
 
                 Ruta.MisPrestamos -> MisPrestamosScreen(
@@ -97,7 +115,14 @@ fun App(database: BibliotecaDatabase, resumen: String, esSeguro: Boolean) {
                     onVolver = { state.abrirCatalogo() },
                 )
 
-                Ruta.Admin -> if (state.usuario?.rol == Rol.BIBLIOTECARIO) {
+                Ruta.Admin -> if (
+                    if (esSeguro) {
+                        state.usuario?.rol == Rol.BIBLIOTECARIO
+                    } else {
+                        // VULN-09: se ignora el rol en el flavor vulnerable.
+                        AccesoVulnerable.puedeVerAdmin(state.usuario?.rol)
+                    }
+                ) {
                     AdminScreen(
                         pendientes = state.pendientes,
                         aprobados = state.aprobados,

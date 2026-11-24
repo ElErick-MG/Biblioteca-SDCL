@@ -1,6 +1,7 @@
 package ec.edu.bibliosec.ui
 
 import ec.edu.bibliosec.data.DatabaseModule
+import ec.edu.bibliosec.data.repo.Repositorios
 import ec.edu.bibliosec.data.toDomain
 import ec.edu.bibliosec.db.BibliotecaDatabase
 import ec.edu.bibliosec.di.secureMode
@@ -19,14 +20,18 @@ import ec.edu.bibliosec.security.PasswordHasher
  * que la navegación sea funcional. En F3/F5 será sustituida por los
  * repositorios `data.vulnerable` / `data.segura` inyectados por ServiceLocator.
  */
-class UiDataSource(private val database: BibliotecaDatabase) {
+class UiDataSource(
+    private val database: BibliotecaDatabase,
+    private val repos: Repositorios? = null,
+) {
 
     private val queries get() = database.bibliotecaQueries
 
     val resumen: String get() = DatabaseModule.resumen(database)
 
-    /** Autenticación de andamiaje: en F3 se hará vulnerable y en F5 segura. */
+    /** F3: delega en el repositorio vulnerable cuando el ServiceLocator lo inyectó. */
     fun autenticar(username: String, password: String): Usuario? {
+        repos?.auth?.let { return it.login(username, password) }
         val fila = queries.loginSeguro(username.trim()).executeAsOneOrNull() ?: return null
         val obtainido = if (secureMode) {
             PasswordHasher().verify(password, fila.password)
@@ -37,6 +42,7 @@ class UiDataSource(private val database: BibliotecaDatabase) {
     }
 
     fun libros(texto: String, rol: Rol): List<Libro> {
+        repos?.libro?.let { return it.buscar(texto, rol) }
         val filas = if (texto.isBlank()) {
             queries.todosLosLibros().executeAsList()
         } else {
@@ -53,10 +59,12 @@ class UiDataSource(private val database: BibliotecaDatabase) {
         queries.todosLosLibros().executeAsList().associate { it.id to it.titulo }
 
     fun prestamosDelUsuario(usuarioId: Long): List<Prestamo> =
-        queries.prestamosDelUsuario(usuarioId).executeAsList().map { it.toDomain() }
+        repos?.prestamo?.delUsuario(usuarioId)
+            ?: queries.prestamosDelUsuario(usuarioId).executeAsList().map { it.toDomain() }
 
     fun prestamosPendientes(): List<Prestamo> =
-        queries.prestamosPendientes().executeAsList().map { it.toDomain() }
+        repos?.prestamo?.pendientes()
+            ?: queries.prestamosPendientes().executeAsList().map { it.toDomain() }
 
     fun prestamosAprobados(): List<Prestamo> =
         queries.prestamosAprobados().executeAsList().map { it.toDomain() }
@@ -64,7 +72,8 @@ class UiDataSource(private val database: BibliotecaDatabase) {
     fun prestamo(id: Long): Prestamo? = queries.prestamoPorId(id).executeAsOneOrNull()?.toDomain()
 
     fun resenas(libroId: Long): List<Resena> =
-        queries.resenasDelLibro(libroId).executeAsList().map { it.toDomain() }
+        repos?.resena?.delLibro(libroId)
+            ?: queries.resenasDelLibro(libroId).executeAsList().map { it.toDomain() }
 
     fun solicitar(
         libroId: Long,
@@ -73,12 +82,23 @@ class UiDataSource(private val database: BibliotecaDatabase) {
         dias: Long,
         observacion: String,
     ): Long {
+        repos?.prestamo?.let {
+            return it.solicitar(libroId, usuarioId, codigoEstudiante, dias, observacion)
+        }
         queries.insertarPrestamo(libroId, usuarioId, codigoEstudiante, dias, observacion, FECHA_DEMO)
         // SQLDelight no expone last_insert_rowid directamente; se toma el último del usuario.
         return queries.prestamosDelUsuario(usuarioId).executeAsList().maxByOrNull { it.id }?.id ?: 0L
     }
 
     fun actualizarEstado(id: Long, estado: EstadoPrestamo) {
+        repos?.prestamo?.let {
+            it.actualizarEstado(
+                id,
+                estado,
+                if (estado == EstadoPrestamo.DEVUELTO) FECHA_DEMO else null,
+            )
+            return
+        }
         queries.actualizarEstadoPrestamo(
             estado = estado.name,
             fechaDevolucion = if (estado == EstadoPrestamo.DEVUELTO) FECHA_DEMO else null,
@@ -98,6 +118,10 @@ class UiDataSource(private val database: BibliotecaDatabase) {
     }
 
     fun agregarResena(libroId: Long, usuarioId: Long, comentario: String) {
+        repos?.resena?.let {
+            it.agregar(libroId, usuarioId, comentario, FECHA_DEMO)
+            return
+        }
         queries.insertarResena(libroId, usuarioId, comentario, FECHA_DEMO)
     }
 

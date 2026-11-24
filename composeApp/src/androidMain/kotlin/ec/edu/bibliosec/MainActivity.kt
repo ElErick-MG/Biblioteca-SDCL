@@ -14,6 +14,7 @@ class MainActivity : ComponentActivity() {
         // F1: la BD se crea y siembra al arrancar. F2 conectará el estado de la
         // sesión y F3/F5 elegirán los repositorios según el flavor.
         val database = ServiceLocator.crearDatabase(DriverFactory(this))
+        ServiceLocator.inicializar(this, database)
         val resumen = DatabaseModule.resumen(database)
 
         setContent {

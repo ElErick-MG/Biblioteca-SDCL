@@ -27,6 +27,7 @@ fun PrestamoScreen(
     onObservacion: (String) -> Unit,
     onEnviar: () -> Unit,
     onVolver: () -> Unit,
+    permitirObservacionLarga: Boolean = false,
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text("Solicitud de préstamo", style = MaterialTheme.typography.headlineSmall)
@@ -49,7 +50,7 @@ fun PrestamoScreen(
         )
         OutlinedTextField(
             value = observacion,
-            onValueChange = { if (it.length <= 200) onObservacion(it) },
+            onValueChange = { if (permitirObservacionLarga || it.length <= 200) onObservacion(it) },
             label = { Text("Observación") },
             modifier = Modifier.fillMaxWidth(),
             minLines = 3,

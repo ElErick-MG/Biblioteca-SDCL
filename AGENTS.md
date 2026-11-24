@@ -2,7 +2,7 @@
 
 > **Proyecto:** `BiblioSec` — Sistema de biblioteca móvil con laboratorio de vulnerabilidades (versión *vulnerable* vs. versión *segura*).
 > **Audiencia:** cualquier agente de IA (Google Antigravity / VS Code / CLI) que trabaje en este repositorio.
-> **Estado verificado:** 24/11/2026 — **F0, F1 y F2 completadas y verificadas**: compilan las dos variantes y `./gradlew allTests` pasa con 8 tests (seed, hashing y navegación por rol). F3 pendiente.
+> **Estado verificado:** 24/11/2026 — **F0…F3 completadas y verificadas**: compilan las dos variantes y `./gradlew allTests` pasa con 14 tests (seed, hashing, navegación y payloads de SQLi/XSS/validación/sesión/RBAC). F4 pendiente.
 
 ---
 
@@ -45,7 +45,9 @@
 | Target JVM | `jvm()` sin UI, solo para `JdbcSqliteDriver` en memoria y tests (`jvmTest`); los `actual` de JVM viven en `jvmMain` |
 | SQLDelight 2.4 | Los drivers están en `app.cash.sqldelight.driver.android.AndroidSqliteDriver` y `app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver`; la propiedad generada es `database.bibliotecaQueries` |
 | UI / navegación | `ui/` con `Ruta` (sealed interface), `AppState` (Compose state) y `UiDataSource` temporal; las pantallas son stateless y llevan `@Preview` de `androidx.compose.ui.tooling.preview.Preview` con `compose.preview` |
-| WebView | `expect @Composable ComprobanteWebView` en `commonMain`; actual Android con `AndroidView` + `WebView` (JS/archivos deshabilitados) y actual JVM que muestra el HTML como texto |
+| WebView | `expect @Composable ComprobanteWebView` en `commonMain`; actual Android decide por `BuildConfig.SECURE_MODE` entre `ui.vulnerable.configurarWebViewVulnerable` (JS on) y `ui.segura.configurarWebViewSegura` (JS off); actual JVM muestra el HTML como texto |
+| Código vulnerable | Todo en paquetes `...data.vulnerable` / `...ui.vulnerable` y marcado con `// VULN-n`; `ServiceLocator.inicializar(context, db)` inyecta esos repositorios solo en el flavor vulnerable |
+| Manifiesto vulnerable | Overlay en `src/vulnerable/AndroidManifest.xml` (NO `src/androidVulnerable/`): `allowBackup=true`, `usesCleartextTraffic=true`, INTERNET y `network_security_config` con cleartext |
 | Módulo Gradle | `composeApp/` (único módulo de aplicación) |
 | Dominio | `Usuario`, `Libro`, `Prestamo`, `Resena`, `Rol`, `EstadoPrestamo` (modelos en `domain/`) |
 | Repositorios | Interfaces en `data/repo/`; implementaciones en `data/vulnerable/` y `data/segura/` |
@@ -69,7 +71,7 @@
 | **F0. Setup** | Proyecto KMP, `libs.versions.toml`, SQLDelight, Compose, flavors `vulnerable`/`segura`, `.gitignore`, README | `./gradlew assembleVulnerableDebug assembleSeguraDebug` compila; ambas apps se instalan juntas | ✅ COMPLETADA (24/11/2026) |
 | **F1. Dominio y BD** | Modelos, `Biblioteca.sq`, `DriverFactory`, seed, interfaces de repositorio, `ServiceLocator` | BD con seed (3 usuarios, 13 libros, 3 restringidos, 2 préstamos, 2 reseñas) | ✅ COMPLETADA (24/11/2026) |
 | **F2. UI base** | Login, Catálogo, Solicitud, Comprobante, Reseñas, Mis préstamos, Panel admin + `@Preview` | Navegación completa por rol (lector → catálogo, bibliotecario → admin) | ✅ COMPLETADA (24/11/2026) |
-| **F3. Implementación vulnerable** | Repositorios, sesión insegura, logs, manifiesto inseguro, WebView sin sanitizar, sin validación. Marcar `// VULN-n` | Todos los payloads de la sección 6 funcionan | ⬜ PENDIENTE |
+| **F3. Implementación vulnerable** | Repositorios, sesión insegura, logs, manifiesto inseguro, WebView sin sanitizar, sin validación. Marcar `// VULN-n` | Payloads VULN-01/02/03/04/05/09 verificados por tests; VULN-06/07 verificados en manifiesto. Evidencia gráfica en F4 | ✅ COMPLETADA (24/11/2026) |
 | **F4. Matriz y pentesting** | Ejecutar ataques, evidencias, matriz, MobSF/Semgrep/Detekt sobre `lab-vulnerable` | Evidencias por VULN + reportes iniciales | ⬜ PENDIENTE |
 | **F5. Implementación segura** | Repositorios seguros, validadores, sanitizador, hashing, `EncryptedSharedPreferences`, `AccessPolicy`, manifiesto seguro, R8, `AppLogger` | Los mismos payloads fallan en la app segura | ⬜ PENDIENTE |
 | **F6. Pruebas** | `commonTest` completo (sección 9) | `./gradlew allTests` en verde; cobertura ≥80 % en `validation/` y `security/` | ⬜ PENDIENTE |

@@ -34,8 +34,9 @@ fun ComprobanteScreen(
     observacion: String,
     estado: String,
     onVolver: () -> Unit,
+    htmlVulnerable: String? = null,
 ) {
-    val html = """
+    val html = htmlVulnerable ?: """
         <html><head><meta charset="utf-8">
         <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">
         <style>body{font-family:sans-serif;padding:16px}.t{border:1px solid #888;border-radius:8px;padding:12px}</style>
