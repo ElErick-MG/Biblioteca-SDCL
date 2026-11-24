@@ -56,7 +56,7 @@ Todo requisito se marca con **P0** (obligatorio para la entrega) o **P1** (valor
 | ID | Requisito | Verificación | Fase | Prioridad |
 | :--- | :--- | :--- | :--- | :--- |
 | **RN-01** | Arquitectura **100 % local**: sin backend ni servicios externos. Única excepción: recurso `http://` local/mock para la demo de VULN-06. | Revisión de dependencias y manifiesto | F0/F3 | P0 |
-| **RN-02** | Compilación sin Android Studio: JDK 17+, Android SDK Command Line Tools con `platforms;android-35` y `build-tools;35.0.0`, `ANDROID_HOME` configurado. | `java -version` + `./gradlew ...` | F0 | P0 |
+| **RN-02** | Compilación sin Android Studio: JDK 17+, Android SDK Command Line Tools con `platforms;android-35` y `build-tools;35.0.0`, `ANDROID_HOME` configurado (o `local.properties`). Nota F0: `compileSdk=36` es necesario por Compose 1.11 / androidx.activity 1.13; `targetSdk` permanece en 35. | `java -version` + `./gradlew ...` | F0 | P0 |
 | **RN-03** | UI y modelo de dominio en **español**; identificadores técnicos consistentes. | Revisión de código | F0-F9 | P0 |
 | **RN-04** | Navegación completa y funcional por rol, con Compose Previews en cada pantalla y soporte opcional de Hot Reload en desktop. | Ejecución en dispositivo/@Preview | F2 | P0 |
 | **RN-05** | Mantenibilidad: dependencias hacia adentro (`ui → casos de uso → repositorios → BD`); reglas de seguridad centralizadas en `validation/` y `security/`, sin duplicación. | Detekt + revisión | F1-F5 | P0 |

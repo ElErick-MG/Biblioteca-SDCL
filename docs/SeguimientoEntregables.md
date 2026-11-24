@@ -42,14 +42,14 @@
 | ID | Entregable | Archivo / ubicación | Criterio de aceptación | Fase | Estado | Última actualización |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | E-01 | Repositorio con código e historial de correcciones | GitHub (`lab-vulnerable`, `main`) | Ambas ramas, commits convencionales, PR por VULN, tags `v0.1-vulnerable` / `v1.0-segura` | F0/F7 | ⬜ | — |
-| E-02 | Diagrama de arquitectura / topología | `docs/Arquitectura.md` §3 + `docs/arquitectura.md` | Mermaid adaptado al flujo local y CI/CD, incluido en el informe | F1/F9 | ⬜ | 24/11/2026 (borrador en Arquitectura.md) |
+| E-02 | Diagrama de arquitectura / topología | `docs/Arquitectura.md` §3 + `docs/arquitectura.md` | Mermaid adaptado al flujo local y CI/CD, incluido en el informe | F1/F9 | 🟨 | 24/11/2026 (diagrama listo en Arquitectura.md §3; falta incluirlo en el informe F9) |
 | E-03 | Matriz de seguridad completa | `docs/matriz-seguridad.md` (borrador en §3) | Columnas completas, 9 filas, trazabilidad y riesgo inicial/residual | F4 | ⬜ | 24/11/2026 (borrador inicial) |
 | E-04 | Evidencias de explotación, mitigación y re-test | `docs/evidencias/VULN-0X/` | 4 artefactos por VULN + antes/después (ver §4) | F4/F8 | ⬜ | — |
 | E-05 | Reportes SAST/DAST antes y después | `docs/reportes/` | `semgrep.sarif`, `detekt.html`, `mobsf.pdf` Comparativa vulnerable vs. segura | F4/F7/F8 | ⬜ | — |
 | E-06 | Pipeline CI/CD funcionando | `.github/workflows/devsecops.yml` | Capturas: rojo en `lab-vulnerable`, verde en `main`; APK descargable | F7 | ⬜ | — |
 | E-07 | Demo en vivo con ambas apps | Dispositivo + `scrcpy` | 8 pasos del guion (§6), <12 min, ambas apps instaladas | F9 | ⬜ | — |
 | E-08 | Informe técnico IEEE | `docs/informe-ieee/` + PDF | 11 secciones + referencias; incluye matriz, diagrama y métricas | F9 | ⬜ | — |
-| E-09 | README con credenciales de demo | `README.md` | Usuarios/contraseñas documentados y marcados **solo laboratorio** | F0 | ⬜ | — |
+| E-09 | README con credenciales de demo | `README.md` | Usuarios/contraseñas documentados y marcados **solo laboratorio** | F0 | ✅ | 24/11/2026 |
 | E-10 | Documentación de onboarding para agentes | `AGENTS.md`, `docs/ContextoProyecto.md`, `docs/Requisitos.md`, `docs/Arquitectura.md`, este archivo | Cuatro preguntas respondidas: cómo trabajar, dónde estamos, qué cumplir, cómo se construye | — | ✅ | 24/11/2026 |
 
 ---
@@ -146,6 +146,7 @@ Ruta base: `docs/evidencias/VULN-XX/`. Nombres de archivo sugeridos (ajustar seg
 | Fecha | Fase | Qué se actualizó | Archivos tocados | Por quién |
 | :--- | :--- | :--- | :--- | :--- |
 | 24/11/2026 | — | Creación del documento vivo: mapa rúbrica→entregables, checklist E-01…E-10, matriz borrador VULN-01…09, inventario A1–A8, índice de evidencias, métricas y guion de demo. Todo en estado ⬜ salvo E-10. | `docs/SeguimientoEntregables.md` | Agente de IA |
+| 24/11/2026 | F0 | Setup completado y verificado: proyecto KMP, wrapper Gradle 9.5.0, `libs.versions.toml`, SQLDelight configurado, flavors `vulnerable`/`segura`, `MainActivity`, `App` mínima, `.gitignore`, `local.properties` y README con credenciales de demo. `assembleVulnerableDebug assembleSeguraDebug` en verde; APKs con `applicationId` `ec.edu.bibliosec.vulnerable` / `.segura`, labels y `SECURE_MODE` correctos. E-09 ✅, E-02 🟨. | `settings.gradle.kts`, `build.gradle.kts`, `gradle/`, `gradlew`, `composeApp/`, `.gitignore`, `README.md`, `AGENTS.md`, `docs/*` | Agente de IA |
 
 > **Instrucción:** agrega una fila nueva al final cada vez que alimentes este documento. No sobrescribas las filas anteriores.
 

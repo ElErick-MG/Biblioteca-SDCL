@@ -1,2 +1,24 @@
-# Documentación personal
+# Documentación personal (especificación de entrada)
 .docs/
+
+# Gradle / Java
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+local.properties
+
+# Android / IDE
+*.iml
+.idea/
+.cxx/
+captures/
+.externalNativeBuild/
+*.apk
+*.aab
+
+# SO
+.DS_Store
+Thumbs.db
+
+# Reportes generados (las evidencias sí se versionan)
+*.sarif.bin

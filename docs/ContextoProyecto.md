@@ -36,16 +36,25 @@ Contenido real verificado en la raíz:
 
 ```
 Biblioteca-SDCL/
-├── .docs/                # documentación personal (IGNORADA por Git)
-│   ├── indicaciones.md   # guía base de la asignatura
-│   └── sistemaBiblioteca.md  # ESPECIFICACIÓN MAESTRA (13 secciones)
-├── .gitignore            # ignora .docs/
-└── README.md             # solo el título "# Biblioteca-SDCL"
+├── .docs/                 # documentación personal (IGNORADA por Git)
+├── docs/                  # entregables versionados (onboarding + seguimiento)
+├── composeApp/            # módulo KMP: commonMain + androidMain, flavors, SQLDelight
+├── gradle/                # wrapper + libs.versions.toml
+├── gradlew / gradlew.bat
+├── .gitignore / gradle.properties / local.properties (ignorado)
+├── settings.gradle.kts / build.gradle.kts
+├── AGENTS.md / README.md
+└── build/                 # reports y salidas de Gradle (ignorado)
 ```
 
-**No existe todavía:** `settings.gradle.kts`, `gradle/`, `composeApp/`, archivos `.kt`, `docs/` de entregables, workflow de GitHub Actions ni evidencias.
+**F0 verificada:** `./gradlew assembleVulnerableDebug assembleSeguraDebug` termina en `BUILD SUCCESSFUL`. Se generan:
 
-**Conclusión:** el proyecto está en **F0 (Setup) pendiente**. Todo lo demás es planificación. La documentación de onboarding (`AGENTS.md`, `docs/ContextoProyecto.md`, `docs/Requisitos.md`, `docs/Arquitectura.md`) acaba de crearse; el siguiente paso de implementación es F0.
+- `composeApp/build/outputs/apk/vulnerable/debug/composeApp-vulnerable-debug.apk` → `ec.edu.bibliosec.vulnerable`, label `BiblioSec (VULN)`, `SECURE_MODE=false`.
+- `composeApp/build/outputs/apk/segura/debug/composeApp-segura-debug.apk` → `ec.edu.bibliosec.segura`, label `BiblioSec (SEGURA)`, `SECURE_MODE=true`.
+
+**No existe todavía:** esquema `Biblioteca.sq`, seed, repositorios, pantallas funcionales, tests `commonTest`, workflow de GitHub Actions, reportes ni evidencias.
+
+**Conclusión:** el proyecto está en **F0 completada**; el siguiente paso de implementación es **F1 (Dominio y BD)**.
 
 > Distinción importante: `.docs/` (ignorado, especificación de entrada) ≠ `docs/` (versionado, entregables del proyecto).
 
@@ -72,8 +81,8 @@ Biblioteca-SDCL/
 
 | Fase | Nombre | Estado |
 | :--- | :--- | :--- |
-| F0 | Setup (KMP, SQLDelight, Compose, flavors) | ⬜ PENDIENTE — **siguiente paso de implementación** |
-| F1 | Dominio y base de datos + seed | ⬜ PENDIENTE |
+| F0 | Setup (KMP, SQLDelight, Compose, flavors) | ✅ COMPLETADA y verificada (24/11/2026) |
+| F1 | Dominio y base de datos + seed | ⬜ PENDIENTE — **siguiente paso de implementación** |
 | F2 | UI base y navegación por rol | ⬜ PENDIENTE |
 | F3 | Implementación vulnerable (`// VULN-n`) | ⬜ PENDIENTE |
 | F4 | Matriz de seguridad y pentesting inicial | ⬜ PENDIENTE |
@@ -165,10 +174,11 @@ Las 7 vulnerabilidades exigidas por la guía se cubren con VULN-01 a VULN-08 (SQ
 
 ## 9. Próximo paso concreto para un agente
 
-Si el usuario pide avanzar con la implementación, empezar por **F0. Setup**:
+F0 está cerrada. Si el usuario pide avanzar, empezar por **F1. Dominio y BD**:
 
-1. Crear `settings.gradle.kts`, `build.gradle.kts` raíz y `composeApp/build.gradle.kts` con KMP + Compose + SQLDelight.
-2. Declarar las versiones en `gradle/libs.versions.toml` (sin inventar dependencias nuevas).
-3. Configurar los flavors `vulnerable` y `segura` (dimensión `modo`, `applicationIdSuffix`, `buildConfigField("boolean", "SECURE_MODE", ...)`).
-4. Añadir `.gitignore` de Android/Gradle y ampliar el README con credenciales de demo (marcadas *solo laboratorio*).
-5. Verificar `./gradlew assembleVulnerableDebug assembleSeguraDebug` y actualizar el estado de F0 en este archivo.
+1. Crear los modelos en `commonMain/kotlin/ec/edu/bibliosec/domain/`: `Usuario`, `Libro`, `Prestamo`, `Resena`, `Rol`, `EstadoPrestamo`.
+2. Crear `commonMain/sqldelight/ec/edu/bibliosec/db/Biblioteca.sq` con las 4 tablas, `CHECK`, FK y las consultas parametrizadas de la sección 4 de la especificación.
+3. Implementar `DriverFactory` (`expect/actual`) y el `ServiceLocator` en `di/`.
+4. Cargar el seed automático: 3 usuarios, ≥12 libros (≥3 restringidos), ≥2 préstamos y ≥2 reseñas; contraseñas en texto plano en vulnerable y hasheadas en segura.
+5. Declarar interfaces en `data/repo/` (`AuthRepository`, `LibroRepository`, `PrestamoRepository`, `ResenaRepository`) sin implementaciones aún (llegan en F3/F5).
+6. Verificar que la app abre y la BD se crea con el seed, y actualizar el estado de F1 aquí y en `docs/SeguimientoEntregables.md`.

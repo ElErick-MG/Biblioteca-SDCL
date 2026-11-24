@@ -64,7 +64,7 @@ flowchart LR
 
 ---
 
-## 4. Estructura de módulos y carpetas (planificada)
+## 4. Estructura de módulos y carpetas (F0 implementada; resto planificado)
 
 ```
 BiblioSec/
@@ -391,6 +391,7 @@ flowchart TD
 | ADR-07 | `expect/actual` para hashing, sesión y driver | Lógica compartida en `commonMain`, primitivas criptográficas y SQLite en plataforma |
 | ADR-08 | `.docs/` (ignorado) vs. `docs/` (versionado) | Separar la especificación de entrada de los entregables evaluables |
 | ADR-09 | R8/ProGuard solo en release | Ofuscación como mitigación VULN-08 sin estorbar el debug de la demo |
+| ADR-10 | AGP 9 con banderas de compatibilidad temporal | `com.android.application` + KMP en el mismo módulo requiere `android.builtInKotlin=false` y `android.newDsl=false`; `resValues=true` para `app_name` por flavor; `compileSdk=36` porque Compose 1.11 / activity 1.13 lo exigen (`targetSdk` sigue en 35). Migrar a la estructura de dos módulos antes de AGP 10 |
 
 ---
 
@@ -398,11 +399,14 @@ flowchart TD
 
 | Elemento | Estado |
 | :--- | :--- |
-| `settings.gradle.kts`, `gradle/libs.versions.toml`, `composeApp/` | ❌ No existe (F0) |
-| Código Kotlin (`App.kt`, dominio, repositorios, UI) | ❌ No existe (F1/F2/F3/F5) |
+| `settings.gradle.kts`, `gradle/libs.versions.toml`, `composeApp/`, wrapper | ✅ Creados y compilando (F0, 24/11/2026) |
+| Flavors `vulnerable`/`segura` + `BuildConfig.SECURE_MODE` | ✅ Verificados en los dos APK (F0) |
+| Código Kotlin funcional (dominio, repositorios, pantallas) | ❌ Solo existe `App.kt` mínima y `MainActivity.kt` (F1/F2/F3/F5) |
 | `Biblioteca.sq` y seed | ❌ No existe (F1) |
 | Tests `commonTest` | ❌ No existe (F6) |
 | `.github/workflows/devsecops.yml`, `.semgrep/`, `config/detekt/` | ❌ No existe (F7) |
-| Documentación de onboarding (`AGENTS.md`, `docs/*.md`) | ✅ Creada |
+| Documentación de onboarding y seguimiento | ✅ Creada (`AGENTS.md`, `docs/*.md`) |
 
-**Siguiente paso:** F0. Setup — crear el proyecto KMP, declarar dependencias en `libs.versions.toml`, configurar flavors y verificar `./gradlew assembleVulnerableDebug assembleSeguraDebug`.
+**Verificación F0:** `./gradlew assembleVulnerableDebug assembleSeguraDebug` → `BUILD SUCCESSFUL`; APKs `ec.edu.bibliosec.vulnerable` (`SECURE_MODE=false`) y `ec.edu.bibliosec.segura` (`SECURE_MODE=true`).
+
+**Siguiente paso:** F1. Dominio y BD — modelos, `Biblioteca.sq`, `DriverFactory`, seed y repositorios.

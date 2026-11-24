@@ -2,7 +2,7 @@
 
 > **Proyecto:** `BiblioSec` — Sistema de biblioteca móvil con laboratorio de vulnerabilidades (versión *vulnerable* vs. versión *segura*).
 > **Audiencia:** cualquier agente de IA (Google Antigravity / VS Code / CLI) que trabaje en este repositorio.
-> **Estado verificado:** 24/11/2026 — **F0 (Setup) no iniciada**; el repositorio aún no contiene código fuente.
+> **Estado verificado:** 24/11/2026 — **F0 (Setup) completada y verificada**: `./gradlew assembleVulnerableDebug assembleSeguraDebug` compila y genera dos APK con `applicationId` distinto. F1 pendiente.
 
 ---
 
@@ -41,6 +41,7 @@
 | Tema | Convención |
 | :--- | :--- |
 | Paquete base | `ec.edu.bibliosec` |
+| Gradle / AGP | AGP 9.0 con `android.builtInKotlin=false` y `android.newDsl=false` (modelo clásico, temporal hasta AGP 10); `compileSdk=36`, `targetSdk=35`, JVM target 17; `resValues=true` para `app_name` por flavor |
 | Módulo Gradle | `composeApp/` (único módulo de aplicación) |
 | Dominio | `Usuario`, `Libro`, `Prestamo`, `Resena`, `Rol`, `EstadoPrestamo` (modelos en `domain/`) |
 | Repositorios | Interfaces en `data/repo/`; implementaciones en `data/vulnerable/` y `data/segura/` |
@@ -61,7 +62,7 @@
 
 | Fase | Tareas | Criterio de aceptación | Estado |
 | :--- | :--- | :--- | :--- |
-| **F0. Setup** | Proyecto KMP, `libs.versions.toml`, SQLDelight, Compose, flavors `vulnerable`/`segura`, `.gitignore`, README | `./gradlew assembleVulnerableDebug assembleSeguraDebug` compila; ambas apps se instalan juntas | ⬜ PENDIENTE |
+| **F0. Setup** | Proyecto KMP, `libs.versions.toml`, SQLDelight, Compose, flavors `vulnerable`/`segura`, `.gitignore`, README | `./gradlew assembleVulnerableDebug assembleSeguraDebug` compila; ambas apps se instalan juntas | ✅ COMPLETADA (24/11/2026) |
 | **F1. Dominio y BD** | Modelos, `Biblioteca.sq`, `DriverFactory`, seed, interfaces de repositorio, `ServiceLocator` | BD con seed (≥12 libros, 3 restringidos, 3 usuarios) | ⬜ PENDIENTE |
 | **F2. UI base** | Login, Catálogo, Solicitud, Comprobante, Reseñas, Mis préstamos, Panel admin + `@Preview` | Navegación completa por rol | ⬜ PENDIENTE |
 | **F3. Implementación vulnerable** | Repositorios, sesión insegura, logs, manifiesto inseguro, WebView sin sanitizar, sin validación. Marcar `// VULN-n` | Todos los payloads de la sección 6 funcionan | ⬜ PENDIENTE |
