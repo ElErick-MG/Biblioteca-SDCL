@@ -1,0 +1,174 @@
+# Contexto del Proyecto — BiblioSec
+
+> **Propósito de este archivo:** responder *qué proyecto es este y dónde estamos parados* para que un agente de IA pueda retomar el trabajo sin reconstruir el contexto desde cero.
+> **Estado verificado:** 24/11/2026.
+> **Reglas de trabajo:** ver [`../AGENTS.md`](../AGENTS.md).
+
+---
+
+## 1. Ficha de identidad
+
+| Campo | Valor |
+| :--- | :--- |
+| Asignatura | Desarrollo de Software Seguro |
+| Nombre del proyecto | `BiblioSec` |
+| Naturaleza | Sistema de biblioteca móvil **con laboratorio de vulnerabilidades**: versión *vulnerable* vs. versión *segura* de la misma app |
+| Objetivo general | Diseñar, desarrollar, auditar y asegurar una aplicación de biblioteca integrando seguridad en todo el SDLC (DevSecOps), análisis de riesgos, pentesting controlado y CI/CD |
+| Dominio | Biblioteca universitaria: **lectores** buscan libros y solicitan préstamos; el **bibliotecario** aprueba/rechaza, registra libros y marca devoluciones |
+| Stack | Kotlin Multiplatform + Compose Multiplatform + SQLDelight + SQLite; **100 % local, sin backend externo, sin Android Studio** |
+| IDE / entorno | Google Antigravity o VS Code + JDK 17+ + Android SDK Command Line Tools |
+| Repositorio | GitHub con ramas `lab-vulnerable` (hallazgos) y `main` (parches, pipeline en verde) |
+
+### Regla ética
+
+Todo pentesting se realiza **estrictamente en entorno local controlado** (emulador o dispositivo físico propio). **Está prohibido probar sobre sistemas de terceros.** Las credenciales de demo son **solo de laboratorio** y deben quedar documentadas en el README.
+
+### Cronograma de referencia
+
+- **Primer avance** (aula virtual + mini presentación): 13/11/2026 — **ya transcurrido**. Si no se entregó, priorizar F1–F4 como base de la entrega final.
+- **Entrega final y defensa técnica:** jueves 21 y viernes 22 de enero de 2027.
+
+---
+
+## 2. Estado actual del repositorio
+
+Contenido real verificado en la raíz:
+
+```
+Biblioteca-SDCL/
+├── .docs/                # documentación personal (IGNORADA por Git)
+│   ├── indicaciones.md   # guía base de la asignatura
+│   └── sistemaBiblioteca.md  # ESPECIFICACIÓN MAESTRA (13 secciones)
+├── .gitignore            # ignora .docs/
+└── README.md             # solo el título "# Biblioteca-SDCL"
+```
+
+**No existe todavía:** `settings.gradle.kts`, `gradle/`, `composeApp/`, archivos `.kt`, `docs/` de entregables, workflow de GitHub Actions ni evidencias.
+
+**Conclusión:** el proyecto está en **F0 (Setup) pendiente**. Todo lo demás es planificación. La documentación de onboarding (`AGENTS.md`, `docs/ContextoProyecto.md`, `docs/Requisitos.md`, `docs/Arquitectura.md`) acaba de crearse; el siguiente paso de implementación es F0.
+
+> Distinción importante: `.docs/` (ignorado, especificación de entrada) ≠ `docs/` (versionado, entregables del proyecto).
+
+---
+
+## 3. Fuentes de verdad y mapa de documentación
+
+| Documento | Rol |
+| :--- | :--- |
+| `.docs/sistemaBiblioteca.md` | **Fuente maestra.** Secciones 0–13: instrucciones al agente, alcance, arquitectura, entorno, modelo de datos, metodología, catálogo VULN, pantallas, esqueletos de código, pruebas, CI/CD, rúbrica, fases y checklist. |
+| `.docs/indicaciones.md` | Guía académica original (sin el dominio de biblioteca aún aplicado). |
+| `AGENTS.md` | Cómo debe trabajar el agente dentro del repo. |
+| `docs/ContextoProyecto.md` | Este archivo: dónde estamos. |
+| `docs/Requisitos.md` | Qué debe cumplir la app (HU, RF, RN, RS, RD, RT, RC, RE). |
+| `docs/Arquitectura.md` | Cómo está construida: capas, flavors, BD, seguridad, decisiones. |
+| `docs/SeguimientoEntregables.md` | **Documento vivo**: matriz borrador, checklist de entregables, evidencias, métricas y registro de cambios; se alimenta fase por fase según la rúbrica. |
+| `docs/matriz-seguridad.md` | Matriz de riesgos formal (pendiente, F4; se exporta desde `SeguimientoEntregables.md` §3). |
+| `docs/evidencias/VULN-0X/` | Evidencias por vulnerabilidad (pendiente, F4/F8). |
+| `docs/reportes/` | Semgrep / Detekt / MobSF (pendiente, F4/F7/F8). |
+
+---
+
+## 4. Roadmap y estado de fases
+
+| Fase | Nombre | Estado |
+| :--- | :--- | :--- |
+| F0 | Setup (KMP, SQLDelight, Compose, flavors) | ⬜ PENDIENTE — **siguiente paso de implementación** |
+| F1 | Dominio y base de datos + seed | ⬜ PENDIENTE |
+| F2 | UI base y navegación por rol | ⬜ PENDIENTE |
+| F3 | Implementación vulnerable (`// VULN-n`) | ⬜ PENDIENTE |
+| F4 | Matriz de seguridad y pentesting inicial | ⬜ PENDIENTE |
+| F5 | Implementación segura y controles | ⬜ PENDIENTE |
+| F6 | Pruebas automatizadas | ⬜ PENDIENTE |
+| F7 | CI/CD (GitHub Actions) | ⬜ PENDIENTE |
+| F8 | Re-test, reportes y métricas | ⬜ PENDIENTE |
+| F9 | Informe IEEE, presentación y defensa | ⬜ PENDIENTE |
+
+---
+
+## 5. Dominio funcional
+
+### Módulos (M1–M5)
+
+| Módulo | Descripción | Vulnerabilidades que provoca |
+| :--- | :--- | :--- |
+| **M1. Login y roles** | Autenticación con roles Lector / Bibliotecario | SQLi en login, almacenamiento inseguro, logs con credenciales, control de acceso roto |
+| **M2. Catálogo y buscador** | Búsqueda por título, autor o ISBN | SQLi → fuga de libros restringidos |
+| **M3. Solicitud de préstamo** | Formulario con días, código de estudiante y observación | Input validation deficiente |
+| **M4. Comprobante y reseñas** | Ticket digital en `WebView` y reseñas de libros | XSS |
+| **M5. Panel del bibliotecario** | Aprobación, alta de libros y devoluciones | RBAC roto, exposición de datos |
+| **BD local** | SQLite + SQLDelight | Almacenamiento inseguro, backup, ingeniería inversa |
+
+### Historias de usuario mínimas
+
+| ID | Rol | Historia | Módulo |
+| :--- | :--- | :--- | :--- |
+| HU-01 | Todos | Iniciar sesión con usuario y contraseña según el rol | M1 |
+| HU-02 | Lector | Buscar libros por título, autor o ISBN | M2 |
+| HU-03 | Lector | Solicitar préstamo indicando días (1–15), código de estudiante y observación | M3 |
+| HU-04 | Lector | Ver comprobante digital con título y observación | M4 |
+| HU-05 | Lector | Dejar y leer reseñas de un libro | M4 |
+| HU-06 | Bibliotecario | Aprobar o rechazar préstamos pendientes | M5 |
+| HU-07 | Bibliotecario | Registrar libros (incluyendo *restringidos / uso interno*) | M5 |
+| HU-08 | Bibliotecario | Marcar la devolución de un libro | M5 |
+| HU-09 | Sistema | Un lector **no** debe acceder a pantallas ni acciones del bibliotecario | M1/M5 |
+
+---
+
+## 6. Catálogo de vulnerabilidades (VULN-01 … VULN-09)
+
+| ID | Vulnerabilidad | Riesgo (P×I) | Artefactos pendientes |
+| :--- | :--- | :--- | :--- |
+| VULN-01 | SQLi en login (CWE-89) | 25 Alto | Código, payload, mitigación, re-test |
+| VULN-02 | SQLi en buscador → libros restringidos (CWE-89) | 16 Alto | Ídem |
+| VULN-03 | XSS en comprobante y reseñas (CWE-79) | 16 Alto | Ídem |
+| VULN-04 | Input validation deficiente en préstamo (CWE-20) | 15 Alto | Ídem |
+| VULN-05 | Almacenamiento inseguro de credenciales y sesión (CWE-256/312) | 20 Alto | Ídem |
+| VULN-06 | Tráfico en claro / cleartext (CWE-319) | 6 Bajo | Ídem |
+| VULN-07 | Backup habilitado + logs sensibles (CWE-532/921) | 16 Alto | Ídem |
+| VULN-08 | Ingeniería inversa sin ofuscación (CWE-693) | 12 Medio | Ídem |
+| VULN-09 *(bonus)* | Control de acceso roto en panel admin (CWE-862/285) | 20 Alto | Ídem |
+
+Las 7 vulnerabilidades exigidas por la guía se cubren con VULN-01 a VULN-08 (SQLi dividida en login y búsqueda); VULN-09 es valor agregado.
+
+---
+
+## 7. Entregables y rúbrica (10,0 puntos)
+
+**Entregables:** repo con historial de correcciones · diagrama de arquitectura · matriz de seguridad · evidencias de explotación/mitigación/re-test · reportes SAST/DAST (antes y después) · pipeline CI/CD con evidencia · demo en vivo con ambas apps + `scrcpy` · informe técnico IEEE con métricas.
+
+| Criterio | Puntos |
+| :--- | :---: |
+| Análisis de activos, amenazas, vulnerabilidades, riesgos y matriz | 2,0 |
+| Pentesting controlado (SQLi, XSS, Input Validation y controles móviles) | 2,0 |
+| Diseño/arquitectura y aplicación de controles | 1,5 |
+| Corrección, mitigación, contingencia y re-test | 1,5 |
+| Reporte SAST/DAST (Semgrep, Detekt, MobSF) | 1,0 |
+| Pipeline CI/CD | 1,0 |
+| Informe IEEE, presentación y defensa | 1,0 |
+
+---
+
+## 8. Glosario rápido
+
+| Término | Significado en este proyecto |
+| :--- | :--- |
+| **Flavor** | Variante de build (`vulnerable` / `segura`) con distinto `applicationIdSuffix`: permite instalar ambas apps a la vez |
+| **Product flavors vs. build types** | Se usan *product flavors* en la dimensión `modo` en lugar de build types para poder diferenciar también el `AndroidManifest` |
+| **ServiceLocator** | Punto de composición en `commonMain/di` que elige repositorios según `SECURE_MODE` |
+| **Expect/actual** | Mecanismo KMP para declarar en `commonMain` (`PasswordHasher`, `SessionStore`, `DriverFactory`) e implementar en `androidMain` |
+| **VULN-n** | Identificador de vulnerabilidad; también etiqueta del comentario en el código y del folder de evidencias |
+| **Re-test** | Repetir el mismo payload sobre la versión segura y verificar que falla |
+| **Matriz** | Tabla con trazabilidad Activo → Amenaza (STRIDE) → Vulnerabilidad (CWE/OWASP) → P×I → Control → Contingencia → Evidencia |
+| **lab-vulnerable / main** | Rama con hallazgos (pipeline rojo esperado) / rama con parches (pipeline verde) |
+
+---
+
+## 9. Próximo paso concreto para un agente
+
+Si el usuario pide avanzar con la implementación, empezar por **F0. Setup**:
+
+1. Crear `settings.gradle.kts`, `build.gradle.kts` raíz y `composeApp/build.gradle.kts` con KMP + Compose + SQLDelight.
+2. Declarar las versiones en `gradle/libs.versions.toml` (sin inventar dependencias nuevas).
+3. Configurar los flavors `vulnerable` y `segura` (dimensión `modo`, `applicationIdSuffix`, `buildConfigField("boolean", "SECURE_MODE", ...)`).
+4. Añadir `.gitignore` de Android/Gradle y ampliar el README con credenciales de demo (marcadas *solo laboratorio*).
+5. Verificar `./gradlew assembleVulnerableDebug assembleSeguraDebug` y actualizar el estado de F0 en este archivo.
