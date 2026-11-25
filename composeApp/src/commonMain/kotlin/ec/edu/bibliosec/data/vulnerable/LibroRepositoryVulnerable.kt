@@ -12,15 +12,12 @@ class LibroRepositoryVulnerable(private val database: BibliotecaDatabase) : Libr
     override fun buscar(texto: String, rol: Rol): List<Libro> {
         // VULN-02: concatenación directa; el rol se ignora (VULN-09).
         // Payload: %' OR restringido=1 --
-        // VULN-02 + VULN-09: sin filtro por rol ni por `restringido`; el payload
-        // `%' OR restringido=1 --` hace aparecer los libros de uso interno.
-        val sql = """
-            SELECT * FROM Libro
-            WHERE (titulo LIKE '%$texto%'
-              OR autor LIKE '%$texto%'
-              OR isbn LIKE '%$texto%'
-            )
-        """.trimIndent()
+        // VULN-02: el filtro `restringido = 0` está dentro de cada AND, así que en una búsqueda
+        // normal solo salen libros públicos. Con el payload `%' OR restringido=1 --`
+        // el `--` comenta el resto y queda `... LIKE '%%' OR restringido=1` → filtra los restringidos.
+        val sql = "SELECT * FROM Libro WHERE titulo LIKE '%$texto%' AND restringido = 0 " +
+            "OR autor LIKE '%$texto%' AND restringido = 0 " +
+            "OR isbn LIKE '%$texto%' AND restringido = 0"
         return SqlVulnerable.libros(sql).map { it.toDomain() }
     }
 

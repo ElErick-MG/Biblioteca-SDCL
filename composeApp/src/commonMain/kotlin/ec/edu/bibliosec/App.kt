@@ -49,17 +49,16 @@ fun App(database: BibliotecaDatabase, resumen: String, esSeguro: Boolean) {
                     esSeguro = esSeguro,
                     mensaje = state.mensaje,
                     onLogin = { u, p -> state.login(u, p) },
+                    onLoginAdmin = { u, p -> state.loginAdmin(u, p) },
                 )
 
                 Ruta.Catalogo -> CatalogoScreen(
                     libros = state.libros,
                     busqueda = state.busqueda,
-                    rol = state.usuario?.rol ?: Rol.LECTOR,
                     onBuscar = { state.buscar(it) },
                     onSolicitar = { state.abrirPrestamo(it) },
                     onResenas = { state.abrirResenas(it) },
                     onMisPrestamos = { state.abrirMisPrestamos() },
-                    onAdmin = { state.abrirAdmin() },
                     onCerrarSesion = { state.cerrarSesion() },
                 )
 

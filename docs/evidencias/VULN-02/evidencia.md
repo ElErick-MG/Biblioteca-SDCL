@@ -33,6 +33,10 @@ val sql = """
 
 `VULN-02 SQLi en buscador filtra libros restringidos` → **PASADO**. Aparecen los 3 libros con `restringido = 1` ("Manual interno de adquisiciones", "Archivo histórico reservado", "Tesis embargada") para un usuario LECTOR.
 
+> **Corrección 25/11:** el SQL vulnerable se dejó en una sola línea y el filtro `restringido = 0` se movió **dentro de cada `AND`**:
+> `... WHERE titulo LIKE '%$q%' AND restringido = 0 OR autor LIKE '%$q%' AND restringido = 0 OR isbn LIKE '%$q%' AND restringido = 0`
+> Así una búsqueda normal **no muestra** restringidos, pero el payload `%' OR restringido=1 --` comenta el resto y la consulta queda `... LIKE '%%' OR restringido=1` → **sí los muestra**. `UiDataSource.libros` además usa `runCatching` para que un fallo del driver no derribe la UI. **Reinstalar el APK vulnerable** para probar el cambio.
+
 ## SAST
 
 Semgrep `kotlin-sql-concatenation` en `LibroRepositoryVulnerable.kt:19,20,21` → `docs/reportes/semgrep.json`.

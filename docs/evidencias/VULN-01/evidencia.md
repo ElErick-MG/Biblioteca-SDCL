@@ -9,6 +9,18 @@ Usuario:  ' OR '1'='1' --
 Contraseña: cualquiera
 ```
 
+## Explotación desde el menú de login
+
+La pantalla de inicio de sesión tiene **dos botones**: `Inicio de sesion usuario` e `Inicio de sesion admin`.
+
+- Con `biblio1'--` como usuario y **cualquier contraseña**, el SQL queda
+  `SELECT * FROM Usuario WHERE username = 'biblio1'--' AND password = '...'` → entra como BIBLIOTECARIO.
+- Con `' OR '1'='1' --` y cualquier contraseña, entra con el primer usuario de la BD.
+- Pulsando **Inicio de sesion admin** con el mismo payload se abre el panel aunque la fila devuelta sea `lector1` (VULN-09).
+- Con `biblio1'--` y cualquier contraseña entra directamente como BIBLIOTECARIO.
+
+La mitigación de rol **no se ha aplicado**: está prevista para F5 junto con `AccessPolicy`.
+
 ## Código vulnerable
 
 `composeApp/src/commonMain/kotlin/ec/edu/bibliosec/data/vulnerable/AuthRepositoryVulnerable.kt:12`

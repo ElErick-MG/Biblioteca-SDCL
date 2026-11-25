@@ -22,9 +22,10 @@ fun LoginScreen(
     esSeguro: Boolean,
     mensaje: String,
     onLogin: (String, String) -> Unit,
+    onLoginAdmin: (String, String) -> Unit,
 ) {
-    val usuario = remember { mutableStateOf("lector1") }
-    val clave = remember { mutableStateOf("lector123") }
+    val usuario = remember { mutableStateOf("") }
+    val clave = remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -32,6 +33,7 @@ fun LoginScreen(
     ) {
         Text("BiblioSec", style = MaterialTheme.typography.headlineMedium)
         Text(if (esSeguro) "Variante: SEGURA" else "Variante: VULNERABLE")
+        Text("Demo: lector1/lector123 · biblio1/admin123", style = MaterialTheme.typography.bodySmall)
         Spacer(Modifier.height(16.dp))
         OutlinedTextField(
             value = usuario.value,
@@ -52,7 +54,13 @@ fun LoginScreen(
         }
         Spacer(Modifier.height(12.dp))
         Button(onClick = { onLogin(usuario.value, clave.value) }, modifier = Modifier.fillMaxWidth()) {
-            Text("Ingresar")
+            Text("Inicio de sesion usuario")
+        }
+        Button(
+            onClick = { onLoginAdmin(usuario.value, clave.value) },
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text("Inicio de sesion admin")
         }
     }
 }
@@ -60,5 +68,10 @@ fun LoginScreen(
 @Preview
 @Composable
 private fun LoginPreview() {
-    LoginScreen(esSeguro = true, mensaje = "Credenciales inválidas") { _, _ -> }
+    LoginScreen(
+        esSeguro = true,
+        mensaje = "Credenciales inválidas",
+        onLogin = { _, _ -> },
+        onLoginAdmin = { _, _ -> },
+    )
 }

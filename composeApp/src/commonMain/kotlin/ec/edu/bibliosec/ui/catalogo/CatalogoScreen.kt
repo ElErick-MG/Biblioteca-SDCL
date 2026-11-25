@@ -17,18 +17,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ec.edu.bibliosec.domain.Libro
-import ec.edu.bibliosec.domain.Rol
 
 @Composable
 fun CatalogoScreen(
     libros: List<Libro>,
     busqueda: String,
-    rol: Rol,
     onBuscar: (String) -> Unit,
     onSolicitar: (Long) -> Unit,
     onResenas: (Long) -> Unit,
     onMisPrestamos: () -> Unit,
-    onAdmin: () -> Unit,
     onCerrarSesion: () -> Unit,
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
@@ -42,9 +39,6 @@ fun CatalogoScreen(
         )
         Row {
             TextButton(onClick = onMisPrestamos) { Text("Mis préstamos") }
-            if (rol == Rol.BIBLIOTECARIO) {
-                TextButton(onClick = onAdmin) { Text("Panel admin") }
-            }
             TextButton(onClick = onCerrarSesion) { Text("Salir") }
         }
         LazyColumn {
@@ -72,12 +66,10 @@ private fun CatalogoPreview() {
     CatalogoScreen(
         libros = listOf(libro),
         busqueda = "",
-        rol = Rol.LECTOR,
         onBuscar = {},
         onSolicitar = {},
         onResenas = {},
         onMisPrestamos = {},
-        onAdmin = {},
         onCerrarSesion = {},
     )
 }

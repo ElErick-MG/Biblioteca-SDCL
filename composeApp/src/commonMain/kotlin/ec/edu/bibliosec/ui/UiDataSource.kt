@@ -42,7 +42,8 @@ class UiDataSource(
     }
 
     fun libros(texto: String, rol: Rol): List<Libro> {
-        repos?.libro?.let { return it.buscar(texto, rol) }
+        // El driver Android es más estricto que JDBC; un SQLi mal formado no debe cerrar la app.
+        repos?.libro?.let { return runCatching { it.buscar(texto, rol) }.getOrDefault(emptyList()) }
         val filas = if (texto.isBlank()) {
             queries.todosLosLibros().executeAsList()
         } else {
@@ -114,7 +115,10 @@ class UiDataSource(
         copias: Long,
         restringido: Boolean,
     ) {
-        queries.insertarLibro(isbn, titulo, autor, categoria, copias, if (restringido) 1L else 0L)
+        // INSERT OR IGNORE ya evita ISBN duplicados; runCatching cubre otros fallos del driver.
+        runCatching {
+            queries.insertarLibro(isbn, titulo, autor, categoria, copias, if (restringido) 1L else 0L)
+        }
     }
 
     fun agregarResena(libroId: Long, usuarioId: Long, comentario: String) {

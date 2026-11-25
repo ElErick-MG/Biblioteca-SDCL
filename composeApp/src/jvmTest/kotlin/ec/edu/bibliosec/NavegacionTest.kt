@@ -41,6 +41,29 @@ class NavegacionTest {
     }
 
     @Test
+    fun `loginAdmin vulnerable entra al panel sin verificar rol`() {
+        val state = estado()
+
+        state.loginAdmin("lector1", "lector123")
+
+        assertEquals(Ruta.Admin, state.ruta)
+    }
+
+    @Test
+    fun `loginAdmin segura deniega a un lector`() {
+        val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+        BibliotecaDatabase.Schema.create(driver)
+        val database = BibliotecaDatabase(driver)
+        DatabaseModule.sembrar(database)
+        val state = AppState(UiDataSource(database), esSeguro = true).also { it.iniciar() }
+
+        state.loginAdmin("lector1", "lector123")
+
+        assertEquals(Ruta.Login, state.ruta)
+        assertTrue(state.mensaje.contains("Acceso denegado"))
+    }
+
+    @Test
     fun `credenciales invalidas no navegan`() {
         val state = estado()
         state.login("lector1", "clave-incorrecta")

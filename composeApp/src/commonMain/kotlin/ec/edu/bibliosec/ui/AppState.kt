@@ -69,6 +69,27 @@ class AppState(
         ruta = if (encontrado.rol == Rol.BIBLIOTECARIO) Ruta.Admin else Ruta.Catalogo
     }
 
+    /**
+     * Acceso directo al panel desde el login.
+     * VULN-01/VULN-09: en vulnerable se acepta cualquier credencial que pase el SQLi
+     * y se navega a Admin sin verificar el rol. En segura se exige BIBLIOTECARIO.
+     */
+    fun loginAdmin(nombre: String, clave: String) {
+        val encontrado = source.autenticar(nombre, clave)
+        if (encontrado == null) {
+            mensaje = "Credenciales inválidas"
+            return
+        }
+        if (esSeguro && encontrado.rol != Rol.BIBLIOTECARIO) {
+            mensaje = "Acceso denegado: se requiere rol BIBLIOTECARIO"
+            return
+        }
+        usuario = encontrado
+        mensaje = ""
+        recargar()
+        ruta = Ruta.Admin
+    }
+
     fun cerrarSesion() {
         usuario = null
         mensaje = ""

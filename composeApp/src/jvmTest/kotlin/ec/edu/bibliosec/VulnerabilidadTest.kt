@@ -40,6 +40,16 @@ class VulnerabilidadTest {
     }
 
     @Test
+    fun `VULN-02 busqueda normal no muestra libros restringidos`() {
+        val repo = LibroRepositoryVulnerable(database())
+
+        val libros = repo.buscar("a", Rol.LECTOR)
+
+        assertTrue(libros.isNotEmpty())
+        assertTrue(libros.none { it.restringido })
+    }
+
+    @Test
     fun `VULN-02 SQLi en buscador filtra libros restringidos`() {
         val repo = LibroRepositoryVulnerable(database())
 
@@ -67,6 +77,17 @@ class VulnerabilidadTest {
         sesion.guardar(DatosSesionVulnerable(1, "BIBLIOTECARIO", "biblio1", "admin123"))
 
         assertEquals("admin123", sesion.leer()?.password)
+    }
+
+    @Test
+    fun `VULN-01 SQLi permite entrar como bibliotecario sin password`() {
+        database()
+        val repo = AuthRepositoryVulnerable(crearSesionVulnerable(Unit))
+
+        val usuario = repo.login("biblio1'--", "cualquiera")
+
+        assertNotNull(usuario)
+        assertEquals(Rol.BIBLIOTECARIO, usuario!!.rol)
     }
 
     @Test
