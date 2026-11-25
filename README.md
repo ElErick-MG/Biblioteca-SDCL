@@ -16,7 +16,7 @@ Sistema de biblioteca móvil con laboratorio de vulnerabilidades (versión **vul
 | F1. Dominio y BD | ✅ Completada y verificada (seed + tests `allTests` en verde) |
 | F2. UI base | ✅ Completada (7 pantallas, `@Preview` y navegación por rol) |
 | F3. Implementación vulnerable | ✅ Completada (payloads verificados; evidencia gráfica en F4) |
-| F4. Matriz y pentesting | ⬜ Pendiente |
+| F4. Matriz y pentesting | ✅ Completada (matriz + 8/9 evidencias + Semgrep/Detekt; MobSF/jadx pendientes por entorno) |
 | F5. Implementación segura | ⬜ Pendiente |
 | F6. Pruebas | ⬜ Pendiente |
 | F7. CI/CD | ⬜ Pendiente |

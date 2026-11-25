@@ -395,6 +395,7 @@ flowchart TD
 | ADR-11 | Target `jvm()` sin UI solo para pruebas | Permite verificar el seed y el hashing con `JdbcSqliteDriver` en memoria sin dispositivo; los `actual` de JVM son independientes de los de Android. En SQLDelight 2.4 los drivers están en `app.cash.sqldelight.driver.*` y la propiedad generada es `database.bibliotecaQueries` |
 | ADR-12 | Navegación por estado propio + WebView `expect @Composable` | Se evita añadir una librería de navegación: `Ruta` + `AppState` (Compose state) cubren F2. El comprobante usa `expect @Composable` con actual Android (`WebView`, JS off) y actual JVM (texto), de modo que la UI permanece en `commonMain`. `@Preview` se importa desde `androidx.compose.ui.tooling.preview` con `compose.preview` |
 | ADR-13 | Aislamiento vulnerable + overlay de manifiesto | AGP fusiona el manifiesto de flavor desde `src/vulnerable/` (no desde `src/androidVulnerable/`, que es solo el source set de Kotlin). `SqlVulnerable` usa `SqlDriver.executeQuery` con mapper que itera `cursor.next()` y alcanza el driver compartido de `DatabaseModule`; así se demuestra SQLi sin tocar las consultas parametrizadas |
+| ADR-14 | SAST en F4 | Semgrep usa `p/kotlin` + reglas propias (`p/android` devolvió 404) y requiere `PYTHONUTF8=1` en Windows para escribir SARIF. Detekt no descubre source sets KMP, por lo que se declaran manualmente en `composeApp/build.gradle.kts`; la config excluye el marcador `VULN-` de `ForbiddenComment` porque es obligatorio en el laboratorio |
 
 ---
 
@@ -412,7 +413,9 @@ flowchart TD
 | Implementación vulnerable (`data.vulnerable` / `ui.vulnerable`) | ✅ Creada y marcada con `// VULN-n` (F3) |
 | Overlay de manifiesto vulnerable | ✅ `src/vulnerable/` con backup/cleartext/INTERNET verificado en el APK (F3) |
 | Tests automatizados | 🟨 14 tests en `jvmTest` (seed, hashing, navegación y payloads); suites completas en F6 |
-| `.github/workflows/devsecops.yml`, `.semgrep/`, `config/detekt/` | ❌ No existe (F7) |
+| Matriz y evidencias SAST | ✅ `docs/matriz-seguridad.md` + `docs/evidencias/**` + `docs/reportes/**` (F4) |
+| `.semgrep/`, `config/detekt/` | ✅ Creados y ejecutados (F4) |
+| `.github/workflows/devsecops.yml` | ❌ No existe (F7) |
 | Documentación de onboarding y seguimiento | ✅ Creada (`AGENTS.md`, `docs/*.md`) |
 
 **Verificación F0:** `./gradlew assembleVulnerableDebug assembleSeguraDebug` → `BUILD SUCCESSFUL`; APKs `ec.edu.bibliosec.vulnerable` (`SECURE_MODE=false`) y `ec.edu.bibliosec.segura` (`SECURE_MODE=true`).
@@ -423,4 +426,6 @@ flowchart TD
 
 **Verificación F3:** `./gradlew assembleVulnerableDebug assembleSeguraDebug allTests` → `BUILD SUCCESSFUL` (14 tests). Los payloads `' OR '1'='1' --`, `%' OR restringido=1 --`, `<img onerror>`, días inválidos, sesión en plano y RBAC roto funcionan en la variante vulnerable. Manifiesto vulnerable empaquetado: `allowBackup=true`, `usesCleartextTraffic=true`, INTERNET; segura: `allowBackup=false`.
 
-**Siguiente paso:** F4. Matriz y pentesting — evidencias, Semgrep/Detekt/MobSF y exportación de `docs/matriz-seguridad.md`.
+**Verificación F4:** matriz exportada con 8 filas ✅ y VULN-08 🟨; Semgrep 7 hallazgos y Detekt 11; MobSF no ejecutado (sin daemon Docker) y `jadx` no instalado, documentado en `docs/reportes/`.
+
+**Siguiente paso:** F5. Implementación segura — repositorios parametrizados, validadores, `AccessPolicy`, `EncryptedSharedPreferences`, `AppLogger` y overlay seguro.

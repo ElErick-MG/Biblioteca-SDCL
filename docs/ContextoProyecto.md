@@ -58,9 +58,11 @@ Biblioteca-SDCL/
 
 **F3 verificada:** repositorios y componentes vulnerables aislados en `...data.vulnerable` / `...ui.vulnerable` y marcados con `// VULN-n`. `./gradlew allTests` pasa con **14 tests**: los payloads de SQLi en login y buscador, XSS en comprobante, datos inválidos, sesión en texto plano y RBAC roto funcionan; el manifiesto vulnerable empaquetado tiene `allowBackup=true`, `usesCleartextTraffic=true`, permiso INTERNET y `network_security_config` con cleartext (el de segura permanece con `allowBackup=false`).
 
-**No existe todavía:** repositorios seguros (`data.segura`), `Validators`, `AccessPolicy`, `EncryptedSharedPreferences`, `AppLogger`, manifiesto seguro con overlay, workflow de GitHub Actions, reportes ni evidencias gráficas.
+**F4 verificada:** matriz exportada a `docs/matriz-seguridad.md` (9 filas, riesgo inicial y contingencias); 9 carpetas de evidencia con payloads y resultados reales; Semgrep 7 hallazgos y Detekt 11 hallazgos con reportes en `docs/reportes/`. MobSF no se pudo ejecutar (daemon Docker ausente) y `jadx` no está instalado, por lo que VULN-08 sigue en 🟨. No había dispositivo conectado (`adb devices` vacío), así que no hay capturas de pantalla.
 
-**Conclusión:** el proyecto está en **F3 completada**; el siguiente paso es **F4 (matriz y pentesting: evidencias, Semgrep/Detekt/MobSF)**.
+**No existe todavía:** repositorios seguros (`data.segura`), `Validators`, `AccessPolicy`, `EncryptedSharedPreferences`, `AppLogger`, manifiesto seguro con overlay, workflow de GitHub Actions ni comparativa after.
+
+**Conclusión:** el proyecto está en **F4 completada**; el siguiente paso es **F5 (implementación segura y controles)**.
 
 > Distinción importante: `.docs/` (ignorado, especificación de entrada) ≠ `docs/` (versionado, entregables del proyecto).
 
@@ -91,8 +93,8 @@ Biblioteca-SDCL/
 | F1 | Dominio y base de datos + seed | ✅ COMPLETADA y verificada (24/11/2026) |
 | F2 | UI base y navegación por rol | ✅ COMPLETADA y verificada (24/11/2026) |
 | F3 | Implementación vulnerable (`// VULN-n`) | ✅ COMPLETADA y verificada (24/11/2026) |
-| F4 | Matriz de seguridad y pentesting inicial | ⬜ PENDIENTE — **siguiente paso** |
-| F5 | Implementación segura y controles | ⬜ PENDIENTE |
+| F4 | Matriz de seguridad y pentesting inicial | ✅ COMPLETADA y verificada (24/11/2026) |
+| F5 | Implementación segura y controles | ⬜ PENDIENTE — **siguiente paso** |
 | F6 | Pruebas automatizadas | ⬜ PENDIENTE |
 | F7 | CI/CD (GitHub Actions) | ⬜ PENDIENTE |
 | F8 | Re-test, reportes y métricas | ⬜ PENDIENTE |
@@ -180,10 +182,10 @@ Las 7 vulnerabilidades exigidas por la guía se cubren con VULN-01 a VULN-08 (SQ
 
 ## 9. Próximo paso concreto para un agente
 
-F3 está cerrada. Si el usuario pide avanzar, empezar por **F4. Matriz y pentesting inicial**:
+F4 está cerrada. Si el usuario pide avanzar, empezar por **F5. Implementación segura**:
 
-1. Capturar evidencias de explotación en `docs/evidencias/VULN-01 … VULN-09/` (capturas, logs, comandos y salidas) usando solo el emulador/dispositivo propio.
-2. Completar `docs/matriz-seguridad.md` exportando la sección §3 de `docs/SeguimientoEntregables.md`, con riesgo inicial y residual.
-3. Ejecutar Semgrep (`p/kotlin`, `p/android` y `.semgrep/biblio-rules.yml`) y Detekt sobre `lab-vulnerable`, guardando los reportes en `docs/reportes/`.
-4. Ejecutar MobSF sobre el APK vulnerable (Docker, puerto 8000) y exportar el informe PDF/JSON.
-5. Marcar las filas de la matriz como ✅ solo cuando exista evidencia real y actualizar F4 aquí y en `docs/SeguimientoEntregables.md`.
+1. Crear `data/segura/` con repositorios parametrizados (`loginSeguro`, `buscarLibrosSeguro` + filtro por rol), `Validators`, `AccessPolicy`, `AppLogger` y sesión con `EncryptedSharedPreferences`.
+2. Conectar `ServiceLocator` para inyectar esos repositorios cuando `secureMode == true` y dejar la UI sin cambios.
+3. Aplicar `AccessPolicy.require` en navegación, casos de uso y repositorio (VULN-09).
+4. Añadir `androidSegura/AndroidManifest.xml` con `allowBackup="false"`, `usesCleartextTraffic="false"` y `network_security_config` restrictiva (VULN-06/07).
+5. Verificar que los mismos payloads fallan en la app segura y actualizar F5 aquí y en `docs/SeguimientoEntregables.md`.

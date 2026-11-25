@@ -1,0 +1,28 @@
+rules:
+  - id: kotlin-sql-concatenation
+    languages: [kotlin]
+    severity: ERROR
+    message: "Consulta SQL construida con interpolación/concatenación (posible SQLi)."
+    pattern-either:
+      - pattern-regex: "\\$[A-Za-z_][A-Za-z0-9_]*%"
+      - pattern-regex: "WHERE username = '\\$"
+
+  - id: android-webview-js-enabled
+    languages: [kotlin]
+    severity: ERROR
+    message: "WebView con JavaScript habilitado (posible XSS)."
+    pattern-either:
+      - pattern: $S.javaScriptEnabled = true
+      - pattern-regex: "javaScriptEnabled\\s*=\\s*true"
+
+  - id: kotlin-log-sensitive
+    languages: [kotlin]
+    severity: WARNING
+    message: "Posible registro de datos sensibles."
+    pattern-regex: "(Log\\.[dviwe]|println|logSensible)\\(.*(pass|password|clave|token).*\\)"
+
+  - id: kotlin-shared-prefs-password
+    languages: [kotlin]
+    severity: ERROR
+    message: "Contraseña persistida en SharedPreferences sin cifrar."
+    pattern-regex: "putString\\(\\s*\"password\"\\s*,.*\\)"

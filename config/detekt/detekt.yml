@@ -1,0 +1,43 @@
+build:
+  maxIssues: 1000
+
+config:
+  validation: false
+
+formatting:
+  active: false
+
+naming:
+  FunctionNaming:
+    active: false   # Compose usa mayúscula para @Composable
+  MatchingDeclarationName:
+    active: false   # expect/actual y archivos de source set
+
+complexity:
+  LongParameterList:
+    active: false
+  LongMethod:
+    active: false
+  CyclomaticComplexMethod:
+    active: false
+  TooManyFunctions:
+    active: false
+  ReturnCount:
+    active: false
+
+style:
+  MagicNumber:
+    active: false
+  MaxLineLength:
+    threshold: 140
+  ForbiddenComment:
+    active: true
+    values:
+      - 'TODO'
+      - 'FIXME'
+  UnusedPrivateMember:
+    active: false   # las funciones @Preview se usan desde el IDE, no desde código
+  FunctionOnlyReturningConstant:
+    active: false   # VULN-04 y VULN-09 demuestran exactamente eso
+  UnusedParameter:
+    active: false   # los parámetros ignorados son parte de la vulnerabilidad

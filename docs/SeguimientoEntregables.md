@@ -25,11 +25,11 @@
 
 | # | Criterio de la rúbrica | Puntos | Dónde se demuestra (evidencia) | Entregable / archivo | Fase | Estado |
 | :-: | :--- | :---: | :--- | :--- | :--- | :--- |
-| 1 | Análisis de activos, amenazas, vulnerabilidades, riesgos y matriz | **2,0** | Inventario A1–A8 (§3.1), STRIDE, CWE/OWASP, P×I, matriz ampliada | `docs/matriz-seguridad.md` (desde §3 de este archivo) | F4 | ⬜ |
-| 2 | Pentesting controlado (SQLi, XSS, Input Validation y controles móviles) | **2,0** | Payloads ejecutados y capturados por VULN | `docs/evidencias/VULN-01 … VULN-09/` | F4/F8 | ⬜ |
+| 1 | Análisis de activos, amenazas, vulnerabilidades, riesgos y matriz | **2,0** | Inventario A1–A8 (§3.1), STRIDE, CWE/OWASP, P×I, matriz ampliada | `docs/matriz-seguridad.md` (desde §3 de este archivo) | F4 | ✅ |
+| 2 | Pentesting controlado (SQLi, XSS, Input Validation y controles móviles) | **2,0** | Payloads ejecutados y capturados por VULN | `docs/evidencias/VULN-01 … VULN-09/` | F4/F8 | 🟨 (8 de 9 verificados; capturas en dispositivo y `jadx` en F8) |
 | 3 | Diseño/arquitectura y aplicación de controles | **1,5** | `commonMain`, `AccessPolicy`, flavors, repositorios seguros, diagrama | `docs/Arquitectura.md` + código + diagrama Mermaid | F1/F2/F5 | ⬜ |
 | 4 | Corrección, mitigación, contingencia y re-test | **1,5** | Columna *Contingencia* (§3) + re-test manual y automatizado | §3, §4 y §6 de este archivo | F5/F6/F8 | ⬜ |
-| 5 | Reporte de análisis de seguridad (SAST/DAST) | **1,0** | Semgrep + Detekt + MobSF, comparativo antes/después | `docs/reportes/` | F4/F7/F8 | ⬜ |
+| 5 | Reporte de análisis de seguridad (SAST/DAST) | **1,0** | Semgrep + Detekt + MobSF, comparativo antes/después | `docs/reportes/` | F4/F7/F8 | 🟨 (Semgrep 7 + Detekt 11 reales; MobSF bloqueado por Docker) |
 | 6 | Pipeline CI/CD básico | **1,0** | `devsecops.yml`: rojo en `lab-vulnerable`, verde en `main`; APK descargable | `.github/workflows/devsecops.yml` + capturas de Actions | F7 | ⬜ |
 | 7 | Informe IEEE, presentación y defensa | **1,0** | Informe PDF con 11 secciones + demo en vivo <12 min con `scrcpy` | `docs/informe-ieee/` + presentación + guion (§6) | F9 | ⬜ |
 
@@ -43,9 +43,9 @@
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | E-01 | Repositorio con código e historial de correcciones | GitHub (`lab-vulnerable`, `main`) | Ambas ramas, commits convencionales, PR por VULN, tags `v0.1-vulnerable` / `v1.0-segura` | F0/F7 | ⬜ | — |
 | E-02 | Diagrama de arquitectura / topología | `docs/Arquitectura.md` §3 + `docs/arquitectura.md` | Mermaid adaptado al flujo local y CI/CD, incluido en el informe | F1/F9 | 🟨 | 24/11/2026 (diagrama listo en Arquitectura.md §3; falta incluirlo en el informe F9) |
-| E-03 | Matriz de seguridad completa | `docs/matriz-seguridad.md` (borrador en §3) | Columnas completas, 9 filas, trazabilidad y riesgo inicial/residual | F4 | ⬜ | 24/11/2026 (borrador inicial) |
-| E-04 | Evidencias de explotación, mitigación y re-test | `docs/evidencias/VULN-0X/` | 4 artefactos por VULN + antes/después (ver §4) | F4/F8 | ⬜ | — |
-| E-05 | Reportes SAST/DAST antes y después | `docs/reportes/` | `semgrep.sarif`, `detekt.html`, `mobsf.pdf` Comparativa vulnerable vs. segura | F4/F7/F8 | ⬜ | — |
+| E-03 | Matriz de seguridad completa | `docs/matriz-seguridad.md` | Columnas completas, 9 filas, trazabilidad y riesgo inicial/residual | F4 | 🟨 | 24/11/2026 (exportada; residual en F8) |
+| E-04 | Evidencias de explotación, mitigación y re-test | `docs/evidencias/VULN-0X/` | 4 artefactos por VULN + antes/después (ver §4) | F4/F8 | 🟨 | 24/11/2026 (8/9 explotación local; sin capturas en dispositivo) |
+| E-05 | Reportes SAST/DAST antes y después | `docs/reportes/` | `semgrep.sarif`, `detekt.html`, `mobsf.pdf` Comparativa vulnerable vs. segura | F4/F7/F8 | 🟨 | 24/11/2026 (Semgrep + Detekt reales; MobSF sin daemon) |
 | E-06 | Pipeline CI/CD funcionando | `.github/workflows/devsecops.yml` | Capturas: rojo en `lab-vulnerable`, verde en `main`; APK descargable | F7 | ⬜ | — |
 | E-07 | Demo en vivo con ambas apps | Dispositivo + `scrcpy` | 8 pasos del guion (§6), <12 min, ambas apps instaladas | F9 | ⬜ | — |
 | E-08 | Informe técnico IEEE | `docs/informe-ieee/` + PDF | 11 secciones + referencias; incluye matriz, diagrama y métricas | F9 | ⬜ | — |
@@ -56,21 +56,21 @@
 
 ## 3. Matriz de seguridad (borrador vivo → exportar a `docs/matriz-seguridad.md` en F4)
 
-> **Estado F3 (24/11/2026):** las 9 filas pasan a 🟨 *En progreso* porque el código vulnerable ya existe y los payloads están verificados por tests JVM (VULN-01/02/03/04/05/09) o en el manifiesto empaquetado (VULN-06/07). VULN-08 queda pendiente de `jadx`/release. **No se marca ✅ hasta F4**, cuando existan capturas, logs y reportes SAST/DAST reales.
+> **Estado F4 (24/11/2026):** VULN-01…07 y VULN-09 pasan a ✅ *Verificado* con evidencia local real (tests JVM, manifiesto empaquetado y reportes Semgrep/Detekt). VULN-08 sigue 🟨 porque `jadx` no está disponible. La matriz formal se exportó a [`matriz-seguridad.md`](matriz-seguridad.md). El riesgo residual y las capturas en dispositivo se completan en F8.
 
 **Columnas obligatorias:** Activo · Amenaza (STRIDE) · Vulnerabilidad (CWE / OWASP Mobile) · Probabilidad (1-5) · Impacto (1-5) · Riesgo P×I · Control / Mitigación · Contingencia · Responsable · Estado · Evidencia.
 
 | # | Activo | Amenaza (STRIDE) | Vulnerabilidad | P | I | Riesgo | Control / Mitigación | Contingencia | Responsable | P×I residual | Estado | Evidencia |
 | :-: | :--- | :--- | :--- | :-: | :-: | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| 1 | A1/A2 SQLite, credenciales | Spoofing, Elevation of Privilege | **SQLi en login** (CWE-89; M4/M7) · VULN-01 | 5 | 5 | **25 Alto** | Consultas parametrizadas (`WHERE username = ?`) + verificación de hash en código; error genérico; límite de intentos | Invalidar sesiones, restaurar BD desde copia, forzar cambio de contraseñas, parche inmediato | Por asignar | — | 🟨 | `VULN-01/` |
-| 2 | A4 Libros restringidos | Information Disclosure | **SQLi en buscador** (CWE-89): `%' OR restringido=1 --`, `UNION SELECT` · VULN-02 | 4 | 4 | **16 Alto** | Query parametrizada + filtro `restringido = 0` por rol en repositorio; longitud ≤ 60 | Auditar accesos, rotar/reclasificar libros expuestos, parche | Por asignar | — | 🟨 | `VULN-02/` |
-| 3 | A7 `WebView` | Tampering, Information Disclosure | **XSS** en comprobante y reseñas (CWE-79) · VULN-03 | 4 | 4 | **16 Alto** | `HtmlSanitizer.escape()` + `javaScriptEnabled=false` + CSP `default-src 'none'` | Purgar registros contaminados, eliminar reseñas maliciosas, parche | Por asignar | — | 🟨 | `VULN-03/` |
-| 4 | A5 Préstamos | Tampering, Denial of Service | **Input Validation** deficiente (CWE-20) · VULN-04 | 5 | 3 | **15 Alto** | Validadores allowlist/rangos en `commonMain` + tests + `CHECK` en BD | Revertir registros inválidos, reglas de integridad en BD | Por asignar | — | 🟨 | `VULN-04/` |
-| 5 | A2/A3 Credenciales y sesión | Information Disclosure | **Almacenamiento inseguro** (CWE-256/312; M9) · VULN-05 | 4 | 5 | **20 Alto** | PBKDF2/SHA-256 + salt; `EncryptedSharedPreferences` (Keystore) | Forzar reset masivo de contraseñas y cierre de sesiones | Por asignar | — | 🟨 | `VULN-05/` |
-| 6 | A1 Comunicaciones | Information Disclosure (MitM) | **Cleartext traffic** (CWE-319; M5) · VULN-06 | 2 | 3 | **6 Bajo** | `usesCleartextTraffic="false"` + `network_security_config` | Bloquear dominios, rotar secretos expuestos | Por asignar | — | 🟨 | `VULN-06/` |
-| 7 | A1/A3 Datos locales y logs | Information Disclosure | **Backup habilitado + logs sensibles** (CWE-532/921; M9) · VULN-07 | 4 | 4 | **16 Alto** | `allowBackup="false"` + `dataExtractionRules` + eliminar logs en release (`AppLogger`) | Revocar credenciales filtradas, depurar logs | Por asignar | — | 🟨 | `VULN-07/` |
+| 1 | A1/A2 SQLite, credenciales | Spoofing, Elevation of Privilege | **SQLi en login** (CWE-89; M4/M7) · VULN-01 | 5 | 5 | **25 Alto** | Consultas parametrizadas (`WHERE username = ?`) + verificación de hash en código; error genérico; límite de intentos | Invalidar sesiones, restaurar BD desde copia, forzar cambio de contraseñas, parche inmediato | Por asignar | — | ✅ | `VULN-01/` |
+| 2 | A4 Libros restringidos | Information Disclosure | **SQLi en buscador** (CWE-89): `%' OR restringido=1 --`, `UNION SELECT` · VULN-02 | 4 | 4 | **16 Alto** | Query parametrizada + filtro `restringido = 0` por rol en repositorio; longitud ≤ 60 | Auditar accesos, rotar/reclasificar libros expuestos, parche | Por asignar | — | ✅ | `VULN-02/` |
+| 3 | A7 `WebView` | Tampering, Information Disclosure | **XSS** en comprobante y reseñas (CWE-79) · VULN-03 | 4 | 4 | **16 Alto** | `HtmlSanitizer.escape()` + `javaScriptEnabled=false` + CSP `default-src 'none'` | Purgar registros contaminados, eliminar reseñas maliciosas, parche | Por asignar | — | ✅ | `VULN-03/` |
+| 4 | A5 Préstamos | Tampering, Denial of Service | **Input Validation** deficiente (CWE-20) · VULN-04 | 5 | 3 | **15 Alto** | Validadores allowlist/rangos en `commonMain` + tests + `CHECK` en BD | Revertir registros inválidos, reglas de integridad en BD | Por asignar | — | ✅ | `VULN-04/` |
+| 5 | A2/A3 Credenciales y sesión | Information Disclosure | **Almacenamiento inseguro** (CWE-256/312; M9) · VULN-05 | 4 | 5 | **20 Alto** | PBKDF2/SHA-256 + salt; `EncryptedSharedPreferences` (Keystore) | Forzar reset masivo de contraseñas y cierre de sesiones | Por asignar | — | ✅ | `VULN-05/` |
+| 6 | A1 Comunicaciones | Information Disclosure (MitM) | **Cleartext traffic** (CWE-319; M5) · VULN-06 | 2 | 3 | **6 Bajo** | `usesCleartextTraffic="false"` + `network_security_config` | Bloquear dominios, rotar secretos expuestos | Por asignar | — | ✅ | `VULN-06/` |
+| 7 | A1/A3 Datos locales y logs | Information Disclosure | **Backup habilitado + logs sensibles** (CWE-532/921; M9) · VULN-07 | 4 | 4 | **16 Alto** | `allowBackup="false"` + `dataExtractionRules` + eliminar logs en release (`AppLogger`) | Revocar credenciales filtradas, depurar logs | Por asignar | — | ✅ | `VULN-07/` |
 | 8 | A8 `.apk` | Information Disclosure, Tampering | **Ingeniería inversa** sin ofuscación (CWE-693; M7) · VULN-08 | 4 | 3 | **12 Medio** | R8/ProGuard (`isMinifyEnabled`, `isShrinkResources`) | Rotar constantes/claves expuestas y republicar build | Por asignar | — | 🟨 | `VULN-08/` |
-| 9 | A6 Panel admin | Elevation of Privilege | **Control de acceso roto** (CWE-862/285; M3) · VULN-09 *(bonus)* | 4 | 5 | **20 Alto** | `AccessPolicy` + RBAC en UI **y** repositorio/casos de uso; rol leído de BD | Auditar acciones administrativas, revertir aprobaciones indebidas | Por asignar | — | 🟨 | `VULN-09/` |
+| 9 | A6 Panel admin | Elevation of Privilege | **Control de acceso roto** (CWE-862/285; M3) · VULN-09 *(bonus)* | 4 | 5 | **20 Alto** | `AccessPolicy` + RBAC en UI **y** repositorio/casos de uso; rol leído de BD | Auditar acciones administrativas, revertir aprobaciones indebidas | Por asignar | — | ✅ | `VULN-09/` |
 
 ### 3.1 Inventario de activos (A1–A8)
 
@@ -99,15 +99,15 @@ Ruta base: `docs/evidencias/VULN-XX/`. Nombres de archivo sugeridos (ajustar seg
 
 | VULN | (a) Código vulnerable | (b) Payload / explotación | (c) Implementación segura | (d) Re-test manual + automático | Estado |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| VULN-01 | ⬜ `01-codigo-vulnerable.md` | ⬜ `02-payload.md` + capturas | ⬜ `03-mitigacion.md` | ⬜ `04-retest.md` + `ValidatorsTest`/`SqlInjectionTest` | ⬜ |
-| VULN-02 | ⬜ ídem | ⬜ `%' OR restringido=1 --`, `UNION SELECT` | ⬜ ídem | ⬜ ídem | ⬜ |
-| VULN-03 | ⬜ ídem | ⬜ `<img src=x onerror=...>` | ⬜ ídem | ⬜ `HtmlSanitizerTest` | ⬜ |
-| VULN-04 | ⬜ ídem | ⬜ días `-5`/`9999`, obs. 50 000 chars | ⬜ ídem | ⬜ `ValidatorsTest` | ⬜ |
-| VULN-05 | ⬜ ídem | ⬜ `adb shell run-as ...` | ⬜ ídem | ⬜ `PasswordHasherTest` | ⬜ |
-| VULN-06 | ⬜ ídem | ⬜ captura HTTP local | ⬜ ídem | ⬜ MobSF + `CLEARTEXT ... not permitted` | ⬜ |
-| VULN-07 | ⬜ ídem | ⬜ `adb logcat -s AUTH`, `adb backup` | ⬜ ídem | ⬜ log sin credenciales + backup vacío | ⬜ |
-| VULN-08 | ⬜ ídem | ⬜ `jadx -d out_vuln ...` | ⬜ ídem | ⬜ `jadx` sobre APK segura ofuscada | ⬜ |
-| VULN-09 | ⬜ ídem | ⬜ editar `rol` en prefs / ruta `admin` | ⬜ ídem | ⬜ `AccessPolicyTest` | ⬜ |
+| VULN-01 | ✅ `evidencia.md` + código marcado | ✅ `' OR '1'='1' --` (test JVM) | ⬜ F5 | ⬜ F8 | 🟨 |
+| VULN-02 | ✅ `evidencia.md` + código marcado | ✅ `%' OR restringido=1 --` (test JVM) | ⬜ F5 | ⬜ F8 | 🟨 |
+| VULN-03 | ✅ `evidencia.md` + código marcado | ✅ `<img src=x onerror=...>` (test JVM) | ⬜ F5 | ⬜ F8 | 🟨 |
+| VULN-04 | ✅ `evidencia.md` + código marcado | ✅ días `-5`, obs. 50 000 chars | ⬜ F5 | ⬜ F8 | 🟨 |
+| VULN-05 | ✅ `evidencia.md` + código marcado | ✅ sesión en plano (test JVM); ADB pendiente | 🟨 PBKDF2 ya implementado; `EncryptedSharedPreferences` en F5 | ⬜ F8 | 🟨 |
+| VULN-06 | ✅ `evidencia.md` + manifiesto | ✅ `allowBackup/usesCleartextTraffic` en APK | ⬜ F5 | ⬜ MobSF en F8 | 🟨 |
+| VULN-07 | ✅ `evidencia.md` + manifiesto/log | ✅ manifiesto + código `Log.d`; logcat pendiente | ⬜ F5 (`AppLogger`) | ⬜ F8 | 🟨 |
+| VULN-08 | ✅ `evidencia.md` (APK debug) | ⬜ `jadx` no disponible | ⬜ F5 (R8 release) | ⬜ F8 | 🟨 |
+| VULN-09 | ✅ `evidencia.md` + código marcado | ✅ `puedeVerAdmin(null)` (test JVM) | ⬜ F5 (`AccessPolicy`) | ⬜ F8 | 🟨 |
 
 > Cada carpeta debe contener además capturas, logs, los comandos usados y la salida de las herramientas. Los reportes globales van en `docs/reportes/`.
 
@@ -117,14 +117,14 @@ Ruta base: `docs/evidencias/VULN-XX/`. Nombres de archivo sugeridos (ajustar seg
 
 | Métrica | Antes (`lab-vulnerable`) | Después (`main`) | Fuente | Estado |
 | :--- | :--- | :--- | :--- | :--- |
-| Nº de hallazgos por severidad (crítico/alto/medio/bajo) | Sin medir | Sin medir | Semgrep + Detekt + MobSF | ⬜ |
-| Hallazgos Semgrep | Sin medir | Sin medir | `docs/reportes/semgrep.sarif` | ⬜ |
-| Hallazgos Detekt | Sin medir | Sin medir | `docs/reportes/detekt.html` | ⬜ |
-| Puntaje de seguridad MobSF | Sin medir | Sin medir | `docs/reportes/mobsf.pdf` | ⬜ |
-| Cobertura de tests (`validation/` + `security/`) | Sin medir | Sin medir (objetivo ≥80 %) | `./gradlew allTests` | ⬜ |
-| Estado del pipeline | Rojo esperado | Verde | GitHub Actions (capturas) | ⬜ |
+| Nº de hallazgos por severidad (crítico/alto/medio/bajo) | 4 ERROR + 3 WARNING (Semgrep); 11 issues (Detekt) | Sin medir (F8) | Semgrep + Detekt | 🟨 |
+| Hallazgos Semgrep | **7** (4 SQLi, 1 WebView JS, 1 log sensible, 1 SharedPrefs password) | Sin medir (F8) | `docs/reportes/semgrep.json`, `semgrep.sarif` | ✅ antes |
+| Hallazgos Detekt | **11** (VariableNaming, MaxLineLength, ReturnCount) | Sin medir (F8) | `docs/reportes/detekt.html`, `detekt.sarif` | ✅ antes |
+| Puntaje de seguridad MobSF | **No ejecutado** (daemon Docker no disponible) | Sin medir | `docs/reportes/mobsf-estado.md` | ⬜ |
+| Cobertura de tests (`validation/` + `security/`) | 14 tests en verde (no se midió % aún) | Objetivo ≥80 % (F6) | `./gradlew allTests` | 🟨 |
+| Estado del pipeline | No creado (F7) | No creado (F7) | GitHub Actions | ⬜ |
 | Tiempo de ejecución del pipeline | Sin medir | Sin medir | GitHub Actions | ⬜ |
-| Riesgo residual por VULN (P×I tras control) | Ver §3 | Completar §3 | Matriz de seguridad | ⬜ |
+| Riesgo residual por VULN (P×I tras control) | — (F4 solo riesgo inicial) | Completar en F8 | `docs/matriz-seguridad.md` | ⬜ |
 
 ---
 
@@ -152,6 +152,7 @@ Ruta base: `docs/evidencias/VULN-XX/`. Nombres de archivo sugeridos (ajustar seg
 | 24/11/2026 | F1 | Dominio y BD completados y verificados: modelos, `Biblioteca.sq` (4 tablas + consultas parametrizadas + helpers de seed), `DriverFactory` y `PasswordHasher` expect/actual (Android + JVM), `BuildConfigProvider`, seed de 3 usuarios / 13 libros (3 restringidos) / 2 préstamos / 2 reseñas, interfaces de repositorio y `ServiceLocator`. `assembleVulnerableDebug assembleSeguraDebug` y `allTests` en verde (4 tests: seed, filtro de restringidos y hashing PBKDF2). Matriz sin cambios aún: las VULN se implementan en F3/F5. | `composeApp/src/commonMain/**`, `composeApp/src/androidMain/**`, `composeApp/src/jvmMain/**`, `composeApp/src/jvmTest/**`, `composeApp/build.gradle.kts`, `gradle/libs.versions.toml`, `AGENTS.md`, `README.md`, `docs/*` | Agente de IA |
 | 24/11/2026 | F2 | UI base completada y verificada: 7 pantallas con `@Preview` (Login, Catálogo, Solicitud, Comprobante, Reseñas, Mis préstamos, Admin), `Ruta`/`AppState`/`UiDataSource`, WebView multiplataforma (`expect @Composable`), `HtmlSanitizer` aplicado al comprobante y barrera de rol en navegación. `assembleVulnerableDebug assembleSeguraDebug` y `allTests` en verde (8 tests: +4 de navegación por rol). La matriz sigue sin filas marcadas: F3/F5 implementarán las VULN. | `composeApp/src/commonMain/kotlin/ec/edu/bibliosec/ui/**`, `composeApp/src/commonMain/kotlin/ec/edu/bibliosec/security/HtmlSanitizer.kt`, `composeApp/src/androidMain/**/ui/**`, `composeApp/src/jvmMain/**/ui/**`, `composeApp/src/jvmTest/NavegacionTest.kt`, `composeApp/build.gradle.kts`, `AGENTS.md`, `README.md`, `docs/*` | Agente de IA |
 | 24/11/2026 | F3 | Implementación vulnerable completada: repositorios `data.vulnerable` con SQL concatenado (VULN-01/02), HTML sin escapar y WebView con JS activo (VULN-03), formulario sin validación (VULN-04), sesión SharedPreferences con contraseña en plano (VULN-05), logs `Log.d`/`println` (VULN-07), ruta admin sin rol (VULN-09) y overlay `src/vulnerable/AndroidManifest.xml` con `allowBackup=true` + cleartext + INTERNET (VULN-06). Todo marcado `// VULN-n`. `allTests` en verde (14 tests: 6 nuevos de explotación controlada). Manifiesto vulnerable verificado: `allowBackup=true`, `usesCleartextTraffic=true`, red permitida; segura sigue `allowBackup=false`. Matriz: 9 filas a 🟨; ✅ queda para F4 con evidencia real. | `composeApp/src/commonMain/**/vulnerable/**`, `composeApp/src/androidMain/**/vulnerable/**`, `composeApp/src/androidMain/**/segura/**`, `composeApp/src/vulnerable/**`, `composeApp/src/jvmMain/**/vulnerable/**`, `composeApp/src/jvmTest/VulnerabilidadTest.kt`, `di/ServiceLocator.kt`, `App.kt`, `MainActivity.kt`, `AGENTS.md`, `README.md`, `docs/*` | Agente de IA |
+| 24/11/2026 | F4 | Matriz y pentesting inicial: exportada `docs/matriz-seguridad.md` con 9 filas y trazabilidad completa; creadas 9 carpetas de evidencia con payloads, comandos y resultados reales (tests JVM + manifiesto empaquetado). Semgrep: 7 hallazgos (`kotlin-sql-concatenation` ×4, `android-webview-js-enabled`, `kotlin-log-sensitive`, `kotlin-shared-prefs-password`) en `semgrep.json`/`.sarif`; `p/android` devolvió 404 y se sustituyó por `p/kotlin`. Detekt configurado para KMP: 11 hallazgos en `detekt.html`/`.sarif`. MobSF no ejecutado: daemon Docker ausente (`mobsf-estado.md`). `jadx` no instalado: VULN-08 sigue 🟨. Sin dispositivo conectado (`adb devices` vacío), por lo que no hay capturas. Matriz: 8 filas ✅, VULN-08 🟨. | `docs/matriz-seguridad.md`, `docs/evidencias/**`, `docs/reportes/**`, `.semgrep/biblio-rules.yml`, `config/detekt/detekt.yml`, `composeApp/build.gradle.kts`, `gradle/libs.versions.toml`, `docs/SeguimientoEntregables.md` | Agente de IA |
 
 > **Instrucción:** agrega una fila nueva al final cada vez que alimentes este documento. No sobrescribas las filas anteriores.
 

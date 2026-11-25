@@ -4,6 +4,19 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.sqldelight)
+    alias(libs.plugins.detekt)
+}
+
+detekt {
+    config.setFrom(files("../config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
+    // El plugin no descubre automáticamente los source sets KMP.
+    source = files(
+        "src/commonMain/kotlin",
+        "src/androidMain/kotlin",
+        "src/jvmMain/kotlin",
+        "src/jvmTest/kotlin",
+    )
 }
 
 kotlin {
