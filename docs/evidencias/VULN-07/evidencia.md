@@ -30,6 +30,15 @@ adb backup -f backup.ab ec.edu.bibliosec.vulnerable
 
 Semgrep `kotlin-log-sensitive` en `AuthRepositoryVulnerable.kt:16` → `docs/reportes/semgrep.json`.
 
+## MobSF (25/11/2026)
+
+El informe [`../../reportes/mobsf-vulnerable.pdf`](../../reportes/mobsf-vulnerable.pdf) reporta:
+
+- **Warning:** `Application Data can be Backed up [android:allowBackup=true]`
+- **Info:** `The App logs information. Sensitive information should never be logged.` → `LoggerVulnerableAndroidKt.java`
+
+En el APK segura desaparece el hallazgo de backup. Detalle en [`../../reportes/mobsf-estado.md`](../../reportes/mobsf-estado.md).
+
 ## Mitigación (F5)
 
 `allowBackup="false"` + `dataExtractionRules` + `AppLogger` no-op en release. Re-test en F8.

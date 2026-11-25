@@ -426,6 +426,6 @@ flowchart TD
 
 **Verificación F3:** `./gradlew assembleVulnerableDebug assembleSeguraDebug allTests` → `BUILD SUCCESSFUL` (14 tests). Los payloads `' OR '1'='1' --`, `%' OR restringido=1 --`, `<img onerror>`, días inválidos, sesión en plano y RBAC roto funcionan en la variante vulnerable. Manifiesto vulnerable empaquetado: `allowBackup=true`, `usesCleartextTraffic=true`, INTERNET; segura: `allowBackup=false`.
 
-**Verificación F4:** matriz exportada con 8 filas ✅ y VULN-08 🟨; Semgrep 7 hallazgos y Detekt 11; MobSF no ejecutado (sin daemon Docker) y `jadx` no instalado, documentado en `docs/reportes/`.
+**Verificación F4:** matriz exportada con 8 filas ✅ y VULN-08 🟨; Semgrep 7, Detekt 11 y MobSF vía Docker (vulnerable 50 → segura 60, con PDF/JSON reales). MobSF ejecutó JADX internamente pero no se exportó `out/`; se documenta en `docs/reportes/mobsf-estado.md`.
 
 **Siguiente paso:** F5. Implementación segura — repositorios parametrizados, validadores, `AccessPolicy`, `EncryptedSharedPreferences`, `AppLogger` y overlay seguro.

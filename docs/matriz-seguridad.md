@@ -41,9 +41,11 @@ Clasificación: **Bajo 1-6 · Medio 7-14 · Alto 15-25**. `P×I` es el riesgo in
 | :--- | :--- | :--- | :--- |
 | Semgrep | `semgrep scan --config p/kotlin --config .semgrep/biblio-rules.yml --error composeApp/src` | **7** (4 SQLi, 1 WebView JS, 1 log sensible, 1 SharedPreferences password) | [`semgrep.json`](reportes/semgrep.json), [`semgrep.sarif`](reportes/semgrep.sarif) |
 | Detekt | `./gradlew detekt` | **11** (estilo/complejidad sobre KMP; la config excluye marcadores `VULN-` obligatorios) | [`detekt.html`](reportes/detekt.html), [`detekt.sarif`](reportes/detekt.sarif) |
-| MobSF | `docker run -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest` | **No ejecutado**: daemon Docker no disponible | [`mobsf-estado.md`](reportes/mobsf-estado.md) |
+| MobSF | `docker run -p 8000:8000 -e MOBSF_API_KEY=... opensecurity/mobile-security-framework-mobsf:latest` + REST API | **Vulnerable: 50/100** (5 high, 4 warning) · **Segura: 60/100** (3 high, 3 warning) | [`mobsf-estado.md`](reportes/mobsf-estado.md), `mobsf-vulnerable.pdf`, `mobsf-segura.pdf` |
 
-> Nota: `p/android` devolvió HTTP 404 en el registro de Semgrep, por lo que se usó `p/kotlin` + reglas personalizadas. El comparativo antes/después y el puntaje MobSF se completan en F8.
+La mejora de 50 → 60 en el APK segura se debe a que ya no reporta cleartext ni `allowBackup`; el código vulnerable aún está presente porque F5 no se ha aplicado, así que el comparativo definitivo se repetirá en F8.
+
+> Nota: `p/android` devolvió HTTP 404 en el registro de Semgrep, por lo que se usó `p/kotlin` + reglas personalizadas. MobSF ejecutó internamente JADX, pero no se exportó un `out/` con fuentes; VULN-08 sigue en 🟨.
 
 ## 4. Trazabilidad rápida
 

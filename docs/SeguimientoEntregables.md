@@ -29,7 +29,7 @@
 | 2 | Pentesting controlado (SQLi, XSS, Input Validation y controles móviles) | **2,0** | Payloads ejecutados y capturados por VULN | `docs/evidencias/VULN-01 … VULN-09/` | F4/F8 | 🟨 (8 de 9 verificados; capturas en dispositivo y `jadx` en F8) |
 | 3 | Diseño/arquitectura y aplicación de controles | **1,5** | `commonMain`, `AccessPolicy`, flavors, repositorios seguros, diagrama | `docs/Arquitectura.md` + código + diagrama Mermaid | F1/F2/F5 | ⬜ |
 | 4 | Corrección, mitigación, contingencia y re-test | **1,5** | Columna *Contingencia* (§3) + re-test manual y automatizado | §3, §4 y §6 de este archivo | F5/F6/F8 | ⬜ |
-| 5 | Reporte de análisis de seguridad (SAST/DAST) | **1,0** | Semgrep + Detekt + MobSF, comparativo antes/después | `docs/reportes/` | F4/F7/F8 | 🟨 (Semgrep 7 + Detekt 11 reales; MobSF bloqueado por Docker) |
+| 5 | Reporte de análisis de seguridad (SAST/DAST) | **1,0** | Semgrep + Detekt + MobSF, comparativo antes/después | `docs/reportes/` | F4/F7/F8 | ✅ (Semgrep 7 + Detekt 11 + MobSF 50→60; re-run en F8) |
 | 6 | Pipeline CI/CD básico | **1,0** | `devsecops.yml`: rojo en `lab-vulnerable`, verde en `main`; APK descargable | `.github/workflows/devsecops.yml` + capturas de Actions | F7 | ⬜ |
 | 7 | Informe IEEE, presentación y defensa | **1,0** | Informe PDF con 11 secciones + demo en vivo <12 min con `scrcpy` | `docs/informe-ieee/` + presentación + guion (§6) | F9 | ⬜ |
 
@@ -45,7 +45,7 @@
 | E-02 | Diagrama de arquitectura / topología | `docs/Arquitectura.md` §3 + `docs/arquitectura.md` | Mermaid adaptado al flujo local y CI/CD, incluido en el informe | F1/F9 | 🟨 | 24/11/2026 (diagrama listo en Arquitectura.md §3; falta incluirlo en el informe F9) |
 | E-03 | Matriz de seguridad completa | `docs/matriz-seguridad.md` | Columnas completas, 9 filas, trazabilidad y riesgo inicial/residual | F4 | 🟨 | 24/11/2026 (exportada; residual en F8) |
 | E-04 | Evidencias de explotación, mitigación y re-test | `docs/evidencias/VULN-0X/` | 4 artefactos por VULN + antes/después (ver §4) | F4/F8 | 🟨 | 24/11/2026 (8/9 explotación local; sin capturas en dispositivo) |
-| E-05 | Reportes SAST/DAST antes y después | `docs/reportes/` | `semgrep.sarif`, `detekt.html`, `mobsf.pdf` Comparativa vulnerable vs. segura | F4/F7/F8 | 🟨 | 24/11/2026 (Semgrep + Detekt reales; MobSF sin daemon) |
+| E-05 | Reportes SAST/DAST antes y después | `docs/reportes/` | `semgrep.sarif`, `detekt.html`, `mobsf.pdf` Comparativa vulnerable vs. segura | F4/F7/F8 | ✅ | 25/11/2026 (Semgrep 7, Detekt 11, MobSF 50→60; re-run final en F8) |
 | E-06 | Pipeline CI/CD funcionando | `.github/workflows/devsecops.yml` | Capturas: rojo en `lab-vulnerable`, verde en `main`; APK descargable | F7 | ⬜ | — |
 | E-07 | Demo en vivo con ambas apps | Dispositivo + `scrcpy` | 8 pasos del guion (§6), <12 min, ambas apps instaladas | F9 | ⬜ | — |
 | E-08 | Informe técnico IEEE | `docs/informe-ieee/` + PDF | 11 secciones + referencias; incluye matriz, diagrama y métricas | F9 | ⬜ | — |
@@ -56,7 +56,7 @@
 
 ## 3. Matriz de seguridad (borrador vivo → exportar a `docs/matriz-seguridad.md` en F4)
 
-> **Estado F4 (24/11/2026):** VULN-01…07 y VULN-09 pasan a ✅ *Verificado* con evidencia local real (tests JVM, manifiesto empaquetado y reportes Semgrep/Detekt). VULN-08 sigue 🟨 porque `jadx` no está disponible. La matriz formal se exportó a [`matriz-seguridad.md`](matriz-seguridad.md). El riesgo residual y las capturas en dispositivo se completan en F8.
+> **Estado F4 (actualizado 25/11/2026):** VULN-01…07 y VULN-09 en ✅ *Verificado* con evidencia local real (tests JVM, manifiesto empaquetado, Semgrep/Detekt y MobSF). MobSF ya se ejecutó: 50 (vulnerable) → 60 (segura). VULN-08 sigue 🟨 porque no se exportó un `out/` de JADX (MobSF lo ejecutó internamente). La matriz formal está en [`matriz-seguridad.md`](matriz-seguridad.md). El riesgo residual y las capturas en dispositivo se completan en F8.
 
 **Columnas obligatorias:** Activo · Amenaza (STRIDE) · Vulnerabilidad (CWE / OWASP Mobile) · Probabilidad (1-5) · Impacto (1-5) · Riesgo P×I · Control / Mitigación · Contingencia · Responsable · Estado · Evidencia.
 
@@ -104,9 +104,9 @@ Ruta base: `docs/evidencias/VULN-XX/`. Nombres de archivo sugeridos (ajustar seg
 | VULN-03 | ✅ `evidencia.md` + código marcado | ✅ `<img src=x onerror=...>` (test JVM) | ⬜ F5 | ⬜ F8 | 🟨 |
 | VULN-04 | ✅ `evidencia.md` + código marcado | ✅ días `-5`, obs. 50 000 chars | ⬜ F5 | ⬜ F8 | 🟨 |
 | VULN-05 | ✅ `evidencia.md` + código marcado | ✅ sesión en plano (test JVM); ADB pendiente | 🟨 PBKDF2 ya implementado; `EncryptedSharedPreferences` en F5 | ⬜ F8 | 🟨 |
-| VULN-06 | ✅ `evidencia.md` + manifiesto | ✅ `allowBackup/usesCleartextTraffic` en APK | ⬜ F5 | ⬜ MobSF en F8 | 🟨 |
-| VULN-07 | ✅ `evidencia.md` + manifiesto/log | ✅ manifiesto + código `Log.d`; logcat pendiente | ⬜ F5 (`AppLogger`) | ⬜ F8 | 🟨 |
-| VULN-08 | ✅ `evidencia.md` (APK debug) | ⬜ `jadx` no disponible | ⬜ F5 (R8 release) | ⬜ F8 | 🟨 |
+| VULN-06 | ✅ `evidencia.md` + manifiesto | ✅ `allowBackup/usesCleartextTraffic` en APK + MobSF high | ⬜ F5 | ⬜ F8 | 🟨 |
+| VULN-07 | ✅ `evidencia.md` + manifiesto/log | ✅ MobSF: `allowBackup=true` (warning) + log info | ⬜ F5 (`AppLogger`) | ⬜ F8 | 🟨 |
+| VULN-08 | ✅ `evidencia.md` (APK debug) | 🟨 MobSF ejecutó JADX internamente; falta `out/` explícito | ⬜ F5 (R8 release) | ⬜ F8 | 🟨 |
 | VULN-09 | ✅ `evidencia.md` + código marcado | ✅ `puedeVerAdmin(null)` (test JVM) | ⬜ F5 (`AccessPolicy`) | ⬜ F8 | 🟨 |
 
 > Cada carpeta debe contener además capturas, logs, los comandos usados y la salida de las herramientas. Los reportes globales van en `docs/reportes/`.
@@ -120,7 +120,7 @@ Ruta base: `docs/evidencias/VULN-XX/`. Nombres de archivo sugeridos (ajustar seg
 | Nº de hallazgos por severidad (crítico/alto/medio/bajo) | 4 ERROR + 3 WARNING (Semgrep); 11 issues (Detekt) | Sin medir (F8) | Semgrep + Detekt | 🟨 |
 | Hallazgos Semgrep | **7** (4 SQLi, 1 WebView JS, 1 log sensible, 1 SharedPrefs password) | Sin medir (F8) | `docs/reportes/semgrep.json`, `semgrep.sarif` | ✅ antes |
 | Hallazgos Detekt | **11** (VariableNaming, MaxLineLength, ReturnCount) | Sin medir (F8) | `docs/reportes/detekt.html`, `detekt.sarif` | ✅ antes |
-| Puntaje de seguridad MobSF | **No ejecutado** (daemon Docker no disponible) | Sin medir | `docs/reportes/mobsf-estado.md` | ⬜ |
+| Puntaje de seguridad MobSF | **50/100** (5 high, 4 warning, 2 info) | **60/100** (3 high, 3 warning, 2 info) | `docs/reportes/mobsf-estado.md`, `mobsf-vulnerable.pdf`, `mobsf-segura.pdf` | ✅ antes (re-run en F8) |
 | Cobertura de tests (`validation/` + `security/`) | 14 tests en verde (no se midió % aún) | Objetivo ≥80 % (F6) | `./gradlew allTests` | 🟨 |
 | Estado del pipeline | No creado (F7) | No creado (F7) | GitHub Actions | ⬜ |
 | Tiempo de ejecución del pipeline | Sin medir | Sin medir | GitHub Actions | ⬜ |
@@ -153,6 +153,7 @@ Ruta base: `docs/evidencias/VULN-XX/`. Nombres de archivo sugeridos (ajustar seg
 | 24/11/2026 | F2 | UI base completada y verificada: 7 pantallas con `@Preview` (Login, Catálogo, Solicitud, Comprobante, Reseñas, Mis préstamos, Admin), `Ruta`/`AppState`/`UiDataSource`, WebView multiplataforma (`expect @Composable`), `HtmlSanitizer` aplicado al comprobante y barrera de rol en navegación. `assembleVulnerableDebug assembleSeguraDebug` y `allTests` en verde (8 tests: +4 de navegación por rol). La matriz sigue sin filas marcadas: F3/F5 implementarán las VULN. | `composeApp/src/commonMain/kotlin/ec/edu/bibliosec/ui/**`, `composeApp/src/commonMain/kotlin/ec/edu/bibliosec/security/HtmlSanitizer.kt`, `composeApp/src/androidMain/**/ui/**`, `composeApp/src/jvmMain/**/ui/**`, `composeApp/src/jvmTest/NavegacionTest.kt`, `composeApp/build.gradle.kts`, `AGENTS.md`, `README.md`, `docs/*` | Agente de IA |
 | 24/11/2026 | F3 | Implementación vulnerable completada: repositorios `data.vulnerable` con SQL concatenado (VULN-01/02), HTML sin escapar y WebView con JS activo (VULN-03), formulario sin validación (VULN-04), sesión SharedPreferences con contraseña en plano (VULN-05), logs `Log.d`/`println` (VULN-07), ruta admin sin rol (VULN-09) y overlay `src/vulnerable/AndroidManifest.xml` con `allowBackup=true` + cleartext + INTERNET (VULN-06). Todo marcado `// VULN-n`. `allTests` en verde (14 tests: 6 nuevos de explotación controlada). Manifiesto vulnerable verificado: `allowBackup=true`, `usesCleartextTraffic=true`, red permitida; segura sigue `allowBackup=false`. Matriz: 9 filas a 🟨; ✅ queda para F4 con evidencia real. | `composeApp/src/commonMain/**/vulnerable/**`, `composeApp/src/androidMain/**/vulnerable/**`, `composeApp/src/androidMain/**/segura/**`, `composeApp/src/vulnerable/**`, `composeApp/src/jvmMain/**/vulnerable/**`, `composeApp/src/jvmTest/VulnerabilidadTest.kt`, `di/ServiceLocator.kt`, `App.kt`, `MainActivity.kt`, `AGENTS.md`, `README.md`, `docs/*` | Agente de IA |
 | 24/11/2026 | F4 | Matriz y pentesting inicial: exportada `docs/matriz-seguridad.md` con 9 filas y trazabilidad completa; creadas 9 carpetas de evidencia con payloads, comandos y resultados reales (tests JVM + manifiesto empaquetado). Semgrep: 7 hallazgos (`kotlin-sql-concatenation` ×4, `android-webview-js-enabled`, `kotlin-log-sensitive`, `kotlin-shared-prefs-password`) en `semgrep.json`/`.sarif`; `p/android` devolvió 404 y se sustituyó por `p/kotlin`. Detekt configurado para KMP: 11 hallazgos en `detekt.html`/`.sarif`. MobSF no ejecutado: daemon Docker ausente (`mobsf-estado.md`). `jadx` no instalado: VULN-08 sigue 🟨. Sin dispositivo conectado (`adb devices` vacío), por lo que no hay capturas. Matriz: 8 filas ✅, VULN-08 🟨. | `docs/matriz-seguridad.md`, `docs/evidencias/**`, `docs/reportes/**`, `.semgrep/biblio-rules.yml`, `config/detekt/detekt.yml`, `composeApp/build.gradle.kts`, `gradle/libs.versions.toml`, `docs/SeguimientoEntregables.md` | Agente de IA |
+| 25/11/2026 | F4 (subsanación MobSF) | Docker ya operativo: contenedor `bibliosec-mobsf` levantado con API key. MobSF v4.6.9 ejecutado vía REST sobre ambos APK: vulnerable **50/100** (5 high, 4 warning, 2 info) y segura **60/100** (3 high, 3 warning, 2 info). Reportes `mobsf-vulnerable.pdf/.json` y `mobsf-segura.pdf/.json` en `docs/reportes/`; `mobsf-estado.md` reescrito con comandos y hallazgos. MobSF confirmó cleartext/backup en vulnerable y su ausencia en segura; ejecutó JADX internamente pero no se exportó `out/`, por lo que VULN-08 permanece 🟨. E-05 y criterio 5 de rúbrica pasan a ✅. | `docs/reportes/**`, `docs/matriz-seguridad.md`, `docs/SeguimientoEntregables.md` | Agente de IA |
 
 > **Instrucción:** agrega una fila nueva al final cada vez que alimentes este documento. No sobrescribas las filas anteriores.
 

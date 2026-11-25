@@ -2,7 +2,7 @@
 
 > **Proyecto:** `BiblioSec` — Sistema de biblioteca móvil con laboratorio de vulnerabilidades (versión *vulnerable* vs. versión *segura*).
 > **Audiencia:** cualquier agente de IA (Google Antigravity / VS Code / CLI) que trabaje en este repositorio.
-> **Estado verificado:** 24/11/2026 — **F0…F4 completadas**: 14 tests en verde, matriz exportada a `docs/matriz-seguridad.md`, 9 carpetas de evidencia, Semgrep (7 hallazgos) y Detekt (11). MobSF y `jadx` no disponibles en este entorno; se documentó en los reportes. F5 pendiente.
+> **Estado verificado:** 25/11/2026 — **F0…F4 completadas**: 14 tests en verde, matriz exportada, Semgrep (7), Detekt (11) y MobSF ejecutado (vulnerable 50 → segura 60). Falta exportar `out/` de `jadx` (VULN-08). F5 pendiente.
 
 ---
 
@@ -48,7 +48,7 @@
 | WebView | `expect @Composable ComprobanteWebView` en `commonMain`; actual Android decide por `BuildConfig.SECURE_MODE` entre `ui.vulnerable.configurarWebViewVulnerable` (JS on) y `ui.segura.configurarWebViewSegura` (JS off); actual JVM muestra el HTML como texto |
 | Código vulnerable | Todo en paquetes `...data.vulnerable` / `...ui.vulnerable` y marcado con `// VULN-n`; `ServiceLocator.inicializar(context, db)` inyecta esos repositorios solo en el flavor vulnerable |
 | Manifiesto vulnerable | Overlay en `src/vulnerable/AndroidManifest.xml` (NO `src/androidVulnerable/`): `allowBackup=true`, `usesCleartextTraffic=true`, INTERNET y `network_security_config` con cleartext |
-| Auditoría | Semgrep con `p/kotlin` + `.semgrep/biblio-rules.yml` (con `PYTHONUTF8=1` en Windows); Detekt con source sets KMP declarados manualmente. Reportes en `docs/reportes/`; evidencias en `docs/evidencias/VULN-0X/` |
+| Auditoría | Semgrep con `p/kotlin` + `.semgrep/biblio-rules.yml` (con `PYTHONUTF8=1` en Windows); Detekt con source sets KMP declarados manualmente; MobSF vía Docker (`bibliosec-mobsf`, API key `bibliosec_mobsf_f4_2026`, endpoints `/api/v1/upload`, `/scan`, `/report_json`, `/download_pdf`). Reportes en `docs/reportes/`; evidencias en `docs/evidencias/VULN-0X/` |
 | Módulo Gradle | `composeApp/` (único módulo de aplicación) |
 | Dominio | `Usuario`, `Libro`, `Prestamo`, `Resena`, `Rol`, `EstadoPrestamo` (modelos en `domain/`) |
 | Repositorios | Interfaces en `data/repo/`; implementaciones en `data/vulnerable/` y `data/segura/` |
@@ -73,7 +73,7 @@
 | **F1. Dominio y BD** | Modelos, `Biblioteca.sq`, `DriverFactory`, seed, interfaces de repositorio, `ServiceLocator` | BD con seed (3 usuarios, 13 libros, 3 restringidos, 2 préstamos, 2 reseñas) | ✅ COMPLETADA (24/11/2026) |
 | **F2. UI base** | Login, Catálogo, Solicitud, Comprobante, Reseñas, Mis préstamos, Panel admin + `@Preview` | Navegación completa por rol (lector → catálogo, bibliotecario → admin) | ✅ COMPLETADA (24/11/2026) |
 | **F3. Implementación vulnerable** | Repositorios, sesión insegura, logs, manifiesto inseguro, WebView sin sanitizar, sin validación. Marcar `// VULN-n` | Payloads VULN-01/02/03/04/05/09 verificados por tests; VULN-06/07 verificados en manifiesto. Evidencia gráfica en F4 | ✅ COMPLETADA (24/11/2026) |
-| **F4. Matriz y pentesting** | Ejecutar ataques, evidencias, matriz, MobSF/Semgrep/Detekt sobre `lab-vulnerable` | Matriz exportada + 8/9 evidencias verificadas + Semgrep/Detekt reales (MobSF/jadx bloqueados por entorno) | ✅ COMPLETADA (24/11/2026) |
+| **F4. Matriz y pentesting** | Ejecutar ataques, evidencias, matriz, MobSF/Semgrep/Detekt sobre `lab-vulnerable` | Matriz exportada + 8/9 evidencias + Semgrep/Detekt + MobSF 50→60 (VULN-08 pendiente de `out/`) | ✅ COMPLETADA (25/11/2026) |
 | **F5. Implementación segura** | Repositorios seguros, validadores, sanitizador, hashing, `EncryptedSharedPreferences`, `AccessPolicy`, manifiesto seguro, R8, `AppLogger` | Los mismos payloads fallan en la app segura | ⬜ PENDIENTE |
 | **F6. Pruebas** | `commonTest` completo (sección 9) | `./gradlew allTests` en verde; cobertura ≥80 % en `validation/` y `security/` | ⬜ PENDIENTE |
 | **F7. CI/CD** | `devsecops.yml`, Detekt, reglas Semgrep, ramas y PRs por VULN | Pipeline rojo en `lab-vulnerable`, verde en `main`; APK descargable | ⬜ PENDIENTE |
